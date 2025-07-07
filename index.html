@@ -36,19 +36,38 @@
             to { opacity: 1; }
         }
         
-        .hover-scale {
-            transition: transform 0.3s ease;
-        }
-        
-        .hover-scale:hover {
-            transform: scale(1.05);
-        }
-        
         .slide-hero {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 70vh;
             position: relative;
             overflow: hidden;
+        }
+        
+        @media (max-width: 768px) {
+            .slide-hero {
+                min-height: 50vh;
+            }
+            
+            .hero-texte {
+                font-size: 2.5rem !important;
+            }
+            
+            .py-16 {
+                padding-top: 2rem;
+                padding-bottom: 2rem;
+            }
+            
+            .mb-12 {
+                margin-bottom: 2rem;
+            }
+            
+            .gap-8 {
+                gap: 1rem;
+            }
+            
+            .grid-cols-2 {
+                grid-template-columns: repeat(1, minmax(0, 1fr));
+            }
         }
         
         .slide-hero::before {
@@ -163,12 +182,6 @@
             box-shadow: 0 6px 20px rgba(0,0,0,0.1);
         }
         
-        .moteur-recherche {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
         .logo-site {
             font-size: 2rem;
             font-weight: 800;
@@ -176,12 +189,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-        }
-        
-        .glassmorphism {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .gradient-text {
@@ -195,15 +202,24 @@
             display: none;
         }
         
-        .navbar-blur {
-            backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.9);
+        .scroll-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .scroll-to-top.show {
+            opacity: 1;
+            visibility: visible;
         }
     </style>
 </head>
 <body class="bg-gray-50">
-    <!-- Navigation -->
-    <nav class="navbar-blur shadow-lg sticky top-0 z-50 transition-all duration-300">
+    <nav class="backdrop-blur-xl bg-white/90 shadow-lg sticky top-0 z-50 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center space-x-3">
@@ -213,10 +229,10 @@
                     <h1 class="logo-site">MEFEM</h1>
                 </div>
                 <div class="hidden md:flex space-x-8">
-                    <a href="#accueil" class="text-gray-700 hover:text-purple-600 transition duration-300 font-medium">
+                    <a href="#accueil" class="text-purple-600 border-b-2 border-purple-600 transition duration-300 font-medium">
                         <i class="fas fa-home mr-2"></i>Accueil
                     </a>
-                    <a href="#produits" class="text-gray-700 hover:text-purple-600 transition duration-300 font-medium">
+                    <a href="/page/produit.html" class="text-gray-700 hover:text-purple-600 transition duration-300 font-medium">
                         <i class="fas fa-shopping-bag mr-2"></i>Produits
                     </a>
                     <a href="#contact" class="text-gray-700 hover:text-purple-600 transition duration-300 font-medium">
@@ -230,7 +246,7 @@
                     <button class="btn-inscription hidden md:block text-white px-4 py-2 rounded-full font-medium hover:scale-105 transition duration-300">
                         <i class="fas fa-user-plus mr-2"></i>S'inscrire
                     </button>
-                    <button class="md:hidden">
+                    <button class="md:hidden" id="menu-burger">
                         <i class="fas fa-bars text-2xl"></i>
                     </button>
                 </div>
@@ -238,10 +254,57 @@
         </div>
     </nav>
 
-    <!-- Hero Section avec Slider -->
+    <div id="menu-mobile" class="fixed inset-0 bg-black/50 z-50 hidden">
+        <div class="bg-white h-full w-80 max-w-full transform translate-x-full transition-transform duration-300 ease-in-out">
+            <div class="flex justify-between items-center p-6 border-b">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-gem text-white text-sm"></i>
+                    </div>
+                    <h2 class="text-xl font-bold gradient-text">MEFEM</h2>
+                </div>
+                <button id="fermer-menu" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <nav class="p-6">
+                <ul class="space-y-6">
+                    <li>
+                        <a href="#accueil" class="flex items-center text-gray-700 hover:text-purple-600 transition duration-300 font-medium text-lg">
+                            <i class="fas fa-home mr-3 w-6"></i>Accueil
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/page/produit.html" class="flex items-center text-gray-700 hover:text-purple-600 transition duration-300 font-medium text-lg">
+                            <i class="fas fa-shopping-bag mr-3 w-6"></i>Produits
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#contact" class="flex items-center text-gray-700 hover:text-purple-600 transition duration-300 font-medium text-lg">
+                            <i class="fas fa-phone mr-3 w-6"></i>Contact
+                        </a>
+                    </li>
+                </ul>
+                <div class="mt-8 pt-6 border-t space-y-4">
+                    <button class="w-full btn-connexion text-white px-4 py-3 rounded-full font-medium">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Se connecter
+                    </button>
+                    <button class="w-full btn-inscription text-white px-4 py-3 rounded-full font-medium">
+                        <i class="fas fa-user-plus mr-2"></i>S'inscrire
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </div>
+
     <section id="accueil" class="slide-container slide-hero">
         <div class="slide-item slide-active flex items-center justify-center">
             <div class="max-w-4xl mx-auto text-center px-4 relative z-10">
+                <div class="mb-6">
+                    <span class="inline-block bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
+                        <i class="fas fa-star mr-2"></i>Bienvenue sur MEFEM
+                    </span>
+                </div>
                 <h2 class="text-5xl md:text-7xl font-bold text-white mb-6 hero-texte fade-in">
                     Collection Premium
                 </h2>
@@ -249,10 +312,10 @@
                     Découvrez notre sélection exclusive de produits de qualité
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <button class="glassmorphism text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-purple-600 transition duration-300 hover-scale">
+                    <button class="bg-white/10 backdrop-blur-md text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-purple-600 transition duration-300 hover:scale-105">
                         <i class="fas fa-shopping-cart mr-2"></i>Découvrir
                     </button>
-                    <button class="glassmorphism text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-purple-600 transition duration-300 hover-scale">
+                    <button class="bg-white/10 backdrop-blur-md text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-purple-600 transition duration-300 hover:scale-105">
                         <i class="fas fa-play mr-2"></i>Voir Vidéo
                     </button>
                 </div>
@@ -261,13 +324,18 @@
         
         <div class="slide-item slide-inactive flex items-center justify-center" style="background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);">
             <div class="max-w-4xl mx-auto text-center px-4 relative z-10">
+                <div class="mb-6">
+                    <span class="inline-block bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
+                        <i class="fas fa-fire mr-2"></i>Nouveautés
+                    </span>
+                </div>
                 <h2 class="text-5xl md:text-7xl font-bold text-white mb-6 hero-texte">
                     Mode Premium
                 </h2>
                 <p class="text-xl md:text-2xl text-white mb-8 opacity-90">
                     Les meilleures pièces pour votre style
                 </p>
-                <button class="glassmorphism text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-orange-600 transition duration-300 hover-scale">
+                <button class="bg-white/10 backdrop-blur-md text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-orange-600 transition duration-300 hover:scale-105">
                     <i class="fas fa-eye mr-2"></i>Voir Tout
                 </button>
             </div>
@@ -275,19 +343,23 @@
         
         <div class="slide-item slide-inactive flex items-center justify-center" style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);">
             <div class="max-w-4xl mx-auto text-center px-4 relative z-10">
+                <div class="mb-6">
+                    <span class="inline-block bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
+                        <i class="fas fa-award mr-2"></i>Qualité Garantie
+                    </span>
+                </div>
                 <h2 class="text-5xl md:text-7xl font-bold text-white mb-6 hero-texte">
                     Qualité Garantie
                 </h2>
                 <p class="text-xl md:text-2xl text-white mb-8 opacity-90">
                     Des produits sélectionnés avec soin
                 </p>
-                <button class="glassmorphism text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-blue-600 transition duration-300 hover-scale">
+                <button class="bg-white/10 backdrop-blur-md text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-blue-600 transition duration-300 hover:scale-105">
                     <i class="fas fa-award mr-2"></i>Découvrir
                 </button>
             </div>
         </div>
         
-        <!-- Indicateurs de slide -->
         <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3">
             <button class="w-4 h-4 rounded-full bg-white opacity-50 hover:opacity-100 transition duration-300" onclick="changerSlide(0)"></button>
             <button class="w-4 h-4 rounded-full bg-white opacity-50 hover:opacity-100 transition duration-300" onclick="changerSlide(1)"></button>
@@ -295,53 +367,57 @@
         </div>
     </section>
 
-    <!-- Section Filtres et Recherche -->
-    <section class="py-8 bg-white">
+    <section class="py-16 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Moteur de recherche -->
-            <div class="mb-8">
-                <div class="relative max-w-md mx-auto">
-                    <input type="text" 
-                           id="recherche-produits" 
-                           placeholder="Rechercher un produit..." 
-                           class="moteur-recherche w-full pl-12 pr-4 py-3 rounded-full border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-700 font-medium">
-                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            <div class="text-center mb-12">
+                <div class="inline-block bg-gradient-to-r from-purple-100 to-pink-100 px-6 py-2 rounded-full mb-6">
+                    <span class="text-purple-600 font-semibold">
+                        <i class="fas fa-home mr-2"></i>Page d'Accueil
+                    </span>
                 </div>
+                <h2 class="text-4xl md:text-5xl font-bold gradient-text mb-6">
+                    Bienvenue chez MEFEM
+                </h2>
+                <p class="text-gray-600 max-w-3xl mx-auto text-lg leading-relaxed">
+                    Découvrez notre collection premium de vêtements, accessoires, chaussures et bijoux. 
+                    Nous sélectionnons avec soin chaque produit pour vous offrir le meilleur de la mode 
+                    avec un rapport qualité-prix exceptionnel.
+                </p>
             </div>
             
-            <!-- Filtres par catégorie -->
-            <div class="text-center">
-                <h3 class="text-2xl font-bold text-gray-800 mb-6">
-                    <i class="fas fa-filter mr-2 text-purple-600"></i>
-                    Catégories
-                </h3>
-                <div class="flex flex-wrap justify-center gap-4">
-                    <button class="filtre-btn actif px-6 py-3 rounded-full font-medium bg-white text-gray-700 hover:bg-gray-50" 
-                            onclick="filtrerProduits('tous')">
-                        <i class="fas fa-th-large mr-2"></i>Tous
-                    </button>
-                    <button class="filtre-btn px-6 py-3 rounded-full font-medium bg-white text-gray-700 hover:bg-gray-50" 
-                            onclick="filtrerProduits('vetements')">
-                        <i class="fas fa-tshirt mr-2"></i>Vêtements
-                    </button>
-                    <button class="filtre-btn px-6 py-3 rounded-full font-medium bg-white text-gray-700 hover:bg-gray-50" 
-                            onclick="filtrerProduits('accessoires')">
-                        <i class="fas fa-shopping-bag mr-2"></i>Accessoires
-                    </button>
-                    <button class="filtre-btn px-6 py-3 rounded-full font-medium bg-white text-gray-700 hover:bg-gray-50" 
-                            onclick="filtrerProduits('chaussures')">
-                        <i class="fas fa-shoe-prints mr-2"></i>Chaussures
-                    </button>
-                    <button class="filtre-btn px-6 py-3 rounded-full font-medium bg-white text-gray-700 hover:bg-gray-50" 
-                            onclick="filtrerProduits('bijoux')">
-                        <i class="fas fa-gem mr-2"></i>Bijoux
-                    </button>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-tshirt text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">500+</h3>
+                    <p class="text-gray-600">Produits</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-users text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">1000+</h3>
+                    <p class="text-gray-600">Clients Satisfaits</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shipping-fast text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">24h</h3>
+                    <p class="text-gray-600">Livraison Rapide</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-star text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">4.9/5</h3>
+                    <p class="text-gray-600">Note Moyenne</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Section Produits -->
     <section id="produits" class="py-16 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
@@ -354,405 +430,18 @@
             </div>
             
             <div id="grille-produits" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Produit 1 -->
-                <div class="produit-item carte-produit rounded-3xl shadow-xl overflow-hidden slide-entree" data-categorie="vetements">
-                    <div class="relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=300&fit=crop" 
-                             alt="Robe Élégante" 
-                             class="w-full h-64 object-cover transition-transform duration-300 hover:scale-110">
-                        <div class="absolute bottom-4 left-4 glassmorphism text-white px-3 py-1 rounded-full text-sm font-medium">
-                            <i class="fas fa-tshirt mr-1"></i>Vêtements
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">Robe Élégante</h3>
-                        <p class="text-gray-600 mb-4">
-                            Robe parfaite pour toutes occasions, confectionnée avec des matières premium.
-                        </p>
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center">
-                                <span class="text-2xl font-bold text-purple-600">58.000</span>
-                                <span class="text-sm text-gray-500 ml-1">FCFA</span>
-                            </div>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button onclick="contacterWhatsApp('Robe Élégante', '58.000 FCFA')" 
-                                    class="btn-whatsapp text-white px-4 py-2 rounded-full font-semibold text-sm flex-1">
-                                <i class="fab fa-whatsapp mr-1"></i>WhatsApp
-                            </button>
-                            <button onclick="contacterTelephone('Robe Élégante', '58.000 FCFA')" 
-                                    class="btn-contact text-white px-4 py-2 rounded-full font-semibold text-sm flex-1">
-                                <i class="fas fa-phone mr-1"></i>Appeler
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Produit 2 -->
-                <div class="produit-item carte-produit rounded-3xl shadow-xl overflow-hidden slide-entree" data-categorie="accessoires">
-                    <div class="relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1571945153237-4929e783af4a?w=400&h=300&fit=crop" 
-                             alt="Sac Designer" 
-                             class="w-full h-64 object-cover transition-transform duration-300 hover:scale-110">
-                        <div class="absolute bottom-4 left-4 glassmorphism text-white px-3 py-1 rounded-full text-sm font-medium">
-                            <i class="fas fa-shopping-bag mr-1"></i>Accessoires
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">Sac Designer</h3>
-                        <p class="text-gray-600 mb-4">
-                            Sac à main luxueux en cuir véritable, parfait pour compléter votre look.
-                        </p>
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center">
-                                <span class="text-2xl font-bold text-purple-600">78.000</span>
-                                <span class="text-sm text-gray-500 ml-1">FCFA</span>
-                            </div>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button onclick="contacterWhatsApp('Sac Designer', '78.000 FCFA')" 
-                                    class="btn-whatsapp text-white px-4 py-2 rounded-full font-semibold text-sm flex-1">
-                                <i class="fab fa-whatsapp mr-1"></i>WhatsApp
-                            </button>
-                            <button onclick="contacterTelephone('Sac Designer', '78.000 FCFA')" 
-                                    class="btn-contact text-white px-4 py-2 rounded-full font-semibold text-sm flex-1">
-                                <i class="fas fa-phone mr-1"></i>Appeler
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Produit 3 -->
-                <div class="produit-item carte-produit rounded-3xl shadow-xl overflow-hidden slide-entree" data-categorie="chaussures">
-                    <div class="relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=300&fit=crop" 
-                             alt="Chaussures Premium" 
-                             class="w-full h-64 object-cover transition-transform duration-300 hover:scale-110">
-                        <div class="absolute bottom-4 left-4 glassmorphism text-white px-3 py-1 rounded-full text-sm font-medium">
-                            <i class="fas fa-shoe-prints mr-1"></i>Chaussures
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">Chaussures Premium</h3>
-                        <p class="text-gray-600 mb-4">
-                            Sneakers haut de gamme alliant confort et style pour un look décontracté chic.
-                        </p>
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center">
-                                <span class="text-2xl font-bold text-purple-600">49.000</span>
-                                <span class="text-sm text-gray-500 ml-1">FCFA</span>
-                            </div>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button onclick="contacterWhatsApp('Chaussures Premium', '49.000 FCFA')" 
-                                    class="btn-whatsapp text-white px-4 py-2 rounded-full font-semibold text-sm flex-1">
-                                <i class="fab fa-whatsapp mr-1"></i>WhatsApp
-                            </button>
-                            <button onclick="contacterTelephone('Chaussures Premium', '49.000 FCFA')" 
-                                    class="btn-contact text-white px-4 py-2 rounded-full font-semibold text-sm flex-1">
-                                <i class="fas fa-phone mr-1"></i>Appeler
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Produit 4 -->
-                <div class="produit-item carte-produit rounded-3xl shadow-xl overflow-hidden slide-entree" data-categorie="accessoires">
-                    <div class="relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop" 
-                             alt="Montre Classique" 
-                             class="w-full h-64 object-cover transition-transform duration-300 hover:scale-110">
-                        <div class="absolute bottom-4 left-4 glassmorphism text-white px-3 py-1 rounded-full text-sm font-medium">
-                            <i class="fas fa-clock mr-1"></i>Montres
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">Montre Classique</h3>
-                        <p class="text-gray-600 mb-4">
-                            Montre élégante avec bracelet en cuir, parfaite pour un style intemporel.
-                        </p>
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center">
-                                <span class="text-2xl font-bold text-purple-600">130.000</span>
-                                <span class="text-sm text-gray-500 ml-1">FCFA</span>
-                            </div>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button onclick="contacterWhatsApp('Montre Classique', '130.000 FCFA')" 
-                                    class="btn-whatsapp text-white px-4 py-2 rounded-full font-semibold text-sm flex-1">
-                                <i class="fab fa-whatsapp mr-1"></i>WhatsApp
-                            </button>
-                            <button onclick="contacterTelephone('Montre Classique', '130.000 FCFA')" 
-                                    class="btn-contact text-white px-4 py-2 rounded-full font-semibold text-sm flex-1">
-                                <i class="fas fa-phone mr-1"></i>Appeler
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Produit 5 -->
-                <div class="produit-item carte-produit rounded-3xl shadow-xl overflow-hidden slide-entree" data-categorie="vetements">
-                    <div class="relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1618932260643-eee4a2f652a6?w=400&h=300&fit=crop" 
-                             alt="Veste Tendance" 
-                             class="w-full h-64 object-cover transition-transform duration-300 hover:scale-110">
-                        <div class="absolute bottom-4 left-4 glassmorphism text-white px-3 py-1 rounded-full text-sm font-medium">
-                            <i class="fas fa-tshirt mr-1"></i>Vêtements
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">Veste Tendance</h3>
-                        <p class="text-gray-600 mb-4">
-                            Veste moderne et stylée, parfaite pour les journées fraîches avec un look décontracté.
-                        </p>
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center">
-                                <span class="text-2xl font-bold text-purple-600">68.000</span>
-                                <span class="text-sm text-gray-500 ml-1">FCFA</span>
-                            </div>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button onclick="contacterWhatsApp('Veste Tendance', '68.000 FCFA')" 
-                                    class="btn-whatsapp text-white px-4 py-2 rounded-full font-semibold text-sm flex-1">
-                                <i class="fab fa-whatsapp mr-1"></i>WhatsApp
-                            </button>
-                            <button onclick="contacterTelephone('Veste Tendance', '68.000 FCFA')" 
-                                    class="btn-contact text-white px-4 py-2 rounded-full font-semibold text-sm flex-1">
-                                <i class="fas fa-phone mr-1"></i>Appeler
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Produit 6 -->
-                <div class="produit-item carte-produit rounded-3xl shadow-xl overflow-hidden slide-entree" data-categorie="bijoux">
-                    <div class="relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=300&fit=crop" 
-                             alt="Collier Élégant" 
-                             class="w-full h-64 object-cover transition-transform duration-300 hover:scale-110">
-                        <div class="absolute bottom-4 left-4 glassmorphism text-white px-3 py-1 rounded-full text-sm font-medium">
-                            <i class="fas fa-gem mr-1"></i>Bijoux
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">Collier Élégant</h3>
-                        <p class="text-gray-600 mb-4">
-                            Collier raffiné en or avec pendentif, parfait pour sublimer vos tenues de soirée.
-                        </p>
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center">
-                                <span class="text-2xl font-bold text-purple-600">95.000</span>
-                                <span class="text-sm text-gray-500 ml-1">FCFA</span>
-                            </div>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button onclick="contacterWhatsApp('Collier Élégant', '95.000 FCFA')" 
-                                    class="btn-whatsapp text-white px-4 py-2 rounded-full font-semibold text-sm flex-1">
-                                <i class="fab fa-whatsapp mr-1"></i>WhatsApp
-                            </button>
-                            <button onclick="contacterTelephone('Collier Élégant', '95.000 FCFA')" 
-                                    class="btn-contact text-white px-4 py-2 rounded-full font-semibold text-sm flex-1">
-                                <i class="fas fa-phone mr-1"></i>Appeler
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Produit 7 -->
-                <div class="produit-item carte-produit rounded-3xl shadow-xl overflow-hidden slide-entree" data-categorie="accessoires">
-                    <div class="relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=300&fit=crop" 
-                             alt="Lunettes de Soleil" 
-                             class="w-full h-64 object-cover transition-transform duration-300 hover:scale-110">
-                        <div class="absolute bottom-4 left-4 glassmorphism text-white px-3 py-1 rounded-full text-sm font-medium">
-                            <i class="fas fa-sunglasses mr-1"></i>Accessoires
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">Lunettes de Soleil</h3>
-                        <p class="text-gray-600 mb-4">
-                            Lunettes tendance avec protection UV, alliant style et protection pour vos yeux.
-                        </p>
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center">
-                                <span class="text-2xl font-bold text-purple-600">35.000</span>
-                                <span class="text-sm text-gray-500 ml-1">FCFA</span>
-                            </div>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button onclick="contacterWhatsApp('Lunettes de Soleil', '35.000 FCFA')" 
-                                    class="btn-whatsapp text-white px-4 py-2 rounded-full font-semibold text-sm flex-1">
-                                <i class="fab fa-whatsapp mr-1"></i>WhatsApp
-                            </button>
-                            <button onclick="contacterTelephone('Lunettes de Soleil', '35.000 FCFA')" 
-                                    class="btn-contact text-white px-4 py-2 rounded-full font-semibold text-sm flex-1">
-                                <i class="fas fa-phone mr-1"></i>Appeler
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Produit 8 -->
-                <div class="produit-item carte-produit rounded-3xl shadow-xl overflow-hidden slide-entree" data-categorie="vetements">
-                    <div class="relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1581791534696-e1b83e6a0419?w=400&h=300&fit=crop" 
-                             alt="Chemise Premium" 
-                             class="w-full h-64 object-cover transition-transform duration-300 hover:scale-110">
-                        <div class="absolute bottom-4 left-4 glassmorphism text-white px-3 py-1 rounded-full text-sm font-medium">
-                            <i class="fas fa-tshirt mr-1"></i>Vêtements
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">Chemise Premium</h3>
-                        <p class="text-gray-600 mb-4">
-                            Chemise élégante en coton premium, parfaite pour un look professionnel ou décontracté.
-                        </p>
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center">
-                                <span class="text-2xl font-bold text-purple-600">42.000</span>
-                                <span class="text-sm text-gray-500 ml-1">FCFA</span>
-                            </div>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button onclick="contacterWhatsApp('Chemise Premium', '42.000 FCFA')" 
-                                    class="btn-whatsapp text-white px-4 py-2 rounded-full font-semibold text-sm flex-1">
-                                <i class="fab fa-whatsapp mr-1"></i>WhatsApp
-                            </button>
-                            <button onclick="contacterTelephone('Chemise Premium', '42.000 FCFA')" 
-                                    class="btn-contact text-white px-4 py-2 rounded-full font-semibold text-sm flex-1">
-                                <i class="fas fa-phone mr-1"></i>Appeler
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Produit 9 -->
-                <div class="produit-item carte-produit rounded-3xl shadow-xl overflow-hidden slide-entree" data-categorie="bijoux">
-                    <div class="relative overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=400&h=300&fit=crop" 
-                             alt="Bracelet Luxe" 
-                             class="w-full h-64 object-cover transition-transform duration-300 hover:scale-110">
-                        <div class="absolute bottom-4 left-4 glassmorphism text-white px-3 py-1 rounded-full text-sm font-medium">
-                            <i class="fas fa-gem mr-1"></i>Bijoux
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">Bracelet Luxe</h3>
-                        <p class="text-gray-600 mb-4">
-                            Bracelet en argent avec finitions élégantes, un accessoire indispensable pour votre collection.
-                        </p>
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center">
-                                <span class="text-2xl font-bold text-purple-600">67.000</span>
-                                <span class="text-sm text-gray-500 ml-1">FCFA</span>
-                            </div>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button onclick="contacterWhatsApp('Bracelet Luxe', '67.000 FCFA')" 
-                                    class="btn-whatsapp text-white px-4 py-2 rounded-full font-semibold text-sm flex-1">
-                                <i class="fab fa-whatsapp mr-1"></i>WhatsApp
-                            </button>
-                            <button onclick="contacterTelephone('Bracelet Luxe', '67.000 FCFA')" 
-                                    class="btn-contact text-white px-4 py-2 rounded-full font-semibold text-sm flex-1">
-                                <i class="fas fa-phone mr-1"></i>Appeler
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Section Contact -->
-    <section id="contact" class="py-16 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-4xl md:text-5xl font-bold gradient-text mb-4">
-                    <i class="fas fa-envelope mr-3"></i>Contactez-nous
-                </h2>
-                <p class="text-gray-600 max-w-2xl mx-auto text-lg">
-                    Une question ? Un besoin particulier ? Notre équipe est là pour vous aider !
-                </p>
             </div>
             
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <!-- Informations de contact -->
-                <div class="space-y-8">
-                    <div class="carte-produit rounded-3xl p-6 flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                            <i class="fab fa-whatsapp text-white text-xl"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-xl font-bold text-gray-800">WhatsApp</h4>
-                            <p class="text-gray-600">+225 07 XX XX XX XX</p>
-                        </div>
-                    </div>
-                    
-                    <div class="carte-produit rounded-3xl p-6 flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-teal-500 rounded-full flex items-center justify-center">
-                            <i class="fas fa-phone text-white text-xl"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-xl font-bold text-gray-800">Téléphone</h4>
-                            <p class="text-gray-600">+225 27 XX XX XX XX</p>
-                        </div>
-                    </div>
-                    
-                    <div class="carte-produit rounded-3xl p-6 flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center">
-                            <i class="fas fa-envelope text-white text-xl"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-xl font-bold text-gray-800">Email</h4>
-                            <p class="text-gray-600">contact@mefem.ci</p>
-                        </div>
-                    </div>
-                    
-                    <div class="carte-produit rounded-3xl p-6 flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center">
-                            <i class="fas fa-map-marker-alt text-white text-xl"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-xl font-bold text-gray-800">Adresse</h4>
-                            <p class="text-gray-600">Abidjan, Côte d'Ivoire</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Formulaire de contact -->
-                <div class="carte-produit rounded-3xl p-8">
-                    <h3 class="text-2xl font-bold text-gray-800 mb-6">Envoyez-nous un message</h3>
-                    <form class="space-y-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Nom complet</label>
-                            <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Votre nom">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                            <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="votre@email.com">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
-                            <input type="tel" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="+225 XX XX XX XX">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
-                            <textarea rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Votre message..."></textarea>
-                        </div>
-                        
-                        <button type="submit" class="w-full btn-contact text-white py-3 rounded-lg font-semibold hover:scale-105 transition duration-300">
-                            <i class="fas fa-paper-plane mr-2"></i>Envoyer le message
-                        </button>
-                    </form>
-                </div>
+            <div class="text-center mt-12">
+                <a href="page/produit.html" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-full hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                    <i class="fas fa-eye mr-3"></i>
+                    Voir tous les produits
+                    <i class="fas fa-arrow-right ml-3"></i>
+                </a>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="bg-gray-800 text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -772,8 +461,7 @@
                     <h4 class="text-lg font-semibold mb-4">Liens rapides</h4>
                     <ul class="space-y-2">
                         <li><a href="#accueil" class="text-gray-400 hover:text-white transition">Accueil</a></li>
-                        <li><a href="#produits" class="text-gray-400 hover:text-white transition">Produits</a></li>
-                        <li><a href="#contact" class="text-gray-400 hover:text-white transition">Contact</a></li>
+                        <li><a href="/page/produit.html" class="text-gray-400 hover:text-white transition">Produits</a></li>
                     </ul>
                 </div>
                 
@@ -814,13 +502,184 @@
         </div>
     </footer>
 
+    <button id="scroll-to-top" class="scroll-to-top bg-gradient-to-r from-purple-600 to-pink-600 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
     <script>
-        // Variables globales
+        const produits = [
+            {
+                id: 1,
+                nom: "Robe Élégante",
+                description: "Robe parfaite pour toutes occasions, confectionnée avec des matières premium.",
+                prix: "58.000",
+                categorie: "vetements",
+                image: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=300&fit=crop",
+                icone: "fas fa-tshirt"
+            },
+            {
+                id: 2,
+                nom: "Sac Designer",
+                description: "Sac à main luxueux en cuir véritable, parfait pour compléter votre look.",
+                prix: "78.000",
+                categorie: "accessoires",
+                image: "https://images.unsplash.com/photo-1571945153237-4929e783af4a?w=400&h=300&fit=crop",
+                icone: "fas fa-shopping-bag"
+            },
+            {
+                id: 3,
+                nom: "Chaussures Premium",
+                description: "Sneakers haut de gamme alliant confort et style pour un look décontracté chic.",
+                prix: "49.000",
+                categorie: "chaussures",
+                image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=300&fit=crop",
+                icone: "fas fa-shoe-prints"
+            },
+            {
+                id: 4,
+                nom: "Montre Classique",
+                description: "Montre élégante avec bracelet en cuir, parfaite pour un style intemporel.",
+                prix: "130.000",
+                categorie: "accessoires",
+                image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
+                icone: "fas fa-clock"
+            },
+            {
+                id: 5,
+                nom: "Veste Tendance",
+                description: "Veste moderne et stylée, parfaite pour les journées fraîches avec un look décontracté.",
+                prix: "68.000",
+                categorie: "vetements",
+                image: "https://images.unsplash.com/photo-1618932260643-eee4a2f652a6?w=400&h=300&fit=crop",
+                icone: "fas fa-tshirt"
+            },
+            {
+                id: 6,
+                nom: "Collier Élégant",
+                description: "Collier raffiné en or avec pendentif, parfait pour sublimer vos tenues de soirée.",
+                prix: "95.000",
+                categorie: "bijoux",
+                image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=300&fit=crop",
+                icone: "fas fa-gem"
+            },
+            {
+                id: 7,
+                nom: "Lunettes de Soleil",
+                description: "Lunettes tendance avec protection UV, alliant style et protection pour vos yeux.",
+                prix: "35.000",
+                categorie: "accessoires",
+                image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=300&fit=crop",
+                icone: "fas fa-sunglasses"
+            },
+            {
+                id: 8,
+                nom: "Chemise Premium",
+                description: "Chemise élégante en coton premium, parfaite pour un look professionnel ou décontracté.",
+                prix: "42.000",
+                categorie: "vetements",
+                image: "https://images.unsplash.com/photo-1581791534696-e1b83e6a0419?w=400&h=300&fit=crop",
+                icone: "fas fa-tshirt"
+            },
+            {
+                id: 9,
+                nom: "Bracelet Luxe",
+                description: "Bracelet en argent avec finitions élégantes, un accessoire indispensable pour votre collection.",
+                prix: "67.000",
+                categorie: "bijoux",
+                image: "https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=400&h=300&fit=crop",
+                icone: "fas fa-gem"
+            }
+        ];
+
+        function genererCarteProduit(produit) {
+            const categorieLabels = {
+                'vetements': 'Vêtements',
+                'accessoires': 'Accessoires',
+                'chaussures': 'Chaussures',
+                'bijoux': 'Bijoux'
+            };
+
+            return `
+                <div class="produit-item carte-produit rounded-3xl shadow-xl overflow-hidden slide-entree" data-categorie="${produit.categorie}">
+                    <div class="relative overflow-hidden">
+                        <img src="${produit.image}" 
+                             alt="${produit.nom}" 
+                             class="w-full h-64 object-cover transition-transform duration-300 hover:scale-110">
+                        <div class="absolute bottom-4 left-4 bg-white/10 backdrop-blur-md text-white px-3 py-1 rounded-full text-sm font-medium">
+                            <i class="${produit.icone} mr-1"></i>${categorieLabels[produit.categorie]}
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">${produit.nom}</h3>
+                        <p class="text-gray-600 mb-4">${produit.description}</p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <span class="text-2xl font-bold text-purple-600">${produit.prix}</span>
+                                <span class="text-sm text-gray-500 ml-1">FCFA</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="contacterWhatsApp('${produit.nom}', '${produit.prix} FCFA')" 
+                                    class="btn-whatsapp text-white px-4 py-2 rounded-full font-semibold text-sm flex-1">
+                                <i class="fab fa-whatsapp mr-1"></i>WhatsApp
+                            </button>
+                            <button onclick="contacterTelephone('${produit.nom}', '${produit.prix} FCFA')" 
+                                    class="btn-contact text-white px-4 py-2 rounded-full font-semibold text-sm flex-1">
+                                <i class="fas fa-phone mr-1"></i>Appeler
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function afficherProduits(produitsAAfficher = produits) {
+            const grilleProduits = document.getElementById('grille-produits');
+            grilleProduits.innerHTML = produitsAAfficher.map(produit => genererCarteProduit(produit)).join('');
+        }
+
         let slideActuel = 0;
         const slides = document.querySelectorAll('.slide-item');
         const totalSlides = slides.length;
 
-        // Fonction pour changer de slide
+        const menuBurger = document.getElementById('menu-burger');
+        const menuMobile = document.getElementById('menu-mobile');
+        const fermerMenu = document.getElementById('fermer-menu');
+        const menuContent = menuMobile.querySelector('.bg-white');
+
+        menuBurger.addEventListener('click', function() {
+            menuMobile.classList.remove('hidden');
+            setTimeout(() => {
+                menuContent.classList.remove('translate-x-full');
+            }, 10);
+        });
+
+        function fermerMenuMobile() {
+            menuContent.classList.add('translate-x-full');
+            setTimeout(() => {
+                menuMobile.classList.add('hidden');
+            }, 300);
+        }
+
+        fermerMenu.addEventListener('click', fermerMenuMobile);
+        menuMobile.addEventListener('click', function(e) {
+            if (e.target === menuMobile) {
+                fermerMenuMobile();
+            }
+        });
+
+        document.querySelectorAll('.btn-connexion').forEach(btn => {
+            btn.addEventListener('click', function() {
+                window.location.href = '/auth/login.html';
+            });
+        });
+
+        document.querySelectorAll('.btn-inscription').forEach(btn => {
+            btn.addEventListener('click', function() {
+                window.location.href = '/auth/register.html';
+            });
+        });
+
         function changerSlide(index) {
             slides[slideActuel].classList.remove('slide-active');
             slides[slideActuel].classList.add('slide-inactive');
@@ -830,80 +689,60 @@
             slides[slideActuel].classList.remove('slide-inactive');
             slides[slideActuel].classList.add('slide-active');
             
-            // Mise à jour des indicateurs
             const indicateurs = document.querySelectorAll('.slide-hero .absolute button');
             indicateurs.forEach((btn, i) => {
                 btn.style.opacity = i === slideActuel ? '1' : '0.5';
             });
         }
 
-        // Auto-slider
         function autoSlide() {
             const nextSlide = (slideActuel + 1) % totalSlides;
             changerSlide(nextSlide);
         }
 
-        // Démarrer l'auto-slider
         setInterval(autoSlide, 5000);
 
-        // Initialisation des indicateurs
         document.addEventListener('DOMContentLoaded', function() {
             const indicateurs = document.querySelectorAll('.slide-hero .absolute button');
             indicateurs[0].style.opacity = '1';
+            
+            afficherProduits();
         });
 
-        // Fonction de filtrage des produits
         function filtrerProduits(categorie) {
-            const produits = document.querySelectorAll('.produit-item');
             const boutons = document.querySelectorAll('.filtre-btn');
             
-            // Mise à jour des boutons
             boutons.forEach(btn => btn.classList.remove('actif'));
             event.target.classList.add('actif');
             
-            // Filtrage des produits
-            produits.forEach(produit => {
-                if (categorie === 'tous' || produit.getAttribute('data-categorie') === categorie) {
-                    produit.style.display = 'block';
-                    produit.classList.remove('produit-cache');
-                } else {
-                    produit.style.display = 'none';
-                    produit.classList.add('produit-cache');
-                }
-            });
+            const produitsFiltres = categorie === 'tous' 
+                ? produits 
+                : produits.filter(produit => produit.categorie === categorie);
+            
+            afficherProduits(produitsFiltres);
         }
 
-        // Fonction de recherche
         document.getElementById('recherche-produits').addEventListener('input', function(e) {
             const terme = e.target.value.toLowerCase();
-            const produits = document.querySelectorAll('.produit-item');
+            const produitsRecherches = produits.filter(produit => 
+                produit.nom.toLowerCase().includes(terme) || 
+                produit.description.toLowerCase().includes(terme)
+            );
             
-            produits.forEach(produit => {
-                const titre = produit.querySelector('h3').textContent.toLowerCase();
-                const description = produit.querySelector('p').textContent.toLowerCase();
-                
-                if (titre.includes(terme) || description.includes(terme)) {
-                    produit.style.display = 'block';
-                } else {
-                    produit.style.display = 'none';
-                }
-            });
+            afficherProduits(produitsRecherches);
         });
 
-        // Fonction pour contacter via WhatsApp
         function contacterWhatsApp(produit, prix) {
             const message = encodeURIComponent(`Bonjour, je suis intéressé(e) par le produit "${produit}" au prix de ${prix}. Pouvez-vous me donner plus d'informations ?`);
-            const numeroWhatsApp = "+22507XXXXXX"; // Remplacez par le vrai numéro
+            const numeroWhatsApp = "+22507XXXXXX";
             window.open(`https://wa.me/${numeroWhatsApp}?text=${message}`, '_blank');
         }
 
-        // Fonction pour contacter par téléphone
         function contacterTelephone(produit, prix) {
-            const numeroTelephone = "+22527XXXXXX"; // Remplacez par le vrai numéro
+            const numeroTelephone = "+22527XXXXXX";
             window.open(`tel:${numeroTelephone}`, '_self');
         }
 
-        // Smooth scrolling pour la navigation
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -913,11 +752,13 @@
                         behavior: 'smooth',
                         block: 'start'
                     });
+                    if (!menuMobile.classList.contains('hidden')) {
+                        fermerMenuMobile();
+                    }
                 }
             });
         });
 
-        // Animation au scroll
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -926,35 +767,12 @@
             });
         });
 
-        document.querySelectorAll('.carte-produit').forEach(carte => {
-            observer.observe(carte);
-        });
+        function observerProduits() {
+            document.querySelectorAll('.carte-produit').forEach(carte => {
+                observer.observe(carte);
+            });
+        }
 
-        // Gestion du formulaire de contact
-        document.querySelector('form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Simulation d'envoi
-            const bouton = this.querySelector('button[type="submit"]');
-            const textOriginal = bouton.innerHTML;
-            
-            bouton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Envoi en cours...';
-            bouton.disabled = true;
-            
-            setTimeout(() => {
-                bouton.innerHTML = '<i class="fas fa-check mr-2"></i>Message envoyé !';
-                bouton.style.background = 'linear-gradient(135deg, #25d366 0%, #128c7e 100%)';
-                
-                setTimeout(() => {
-                    bouton.innerHTML = textOriginal;
-                    bouton.disabled = false;
-                    bouton.style.background = '';
-                    this.reset();
-                }, 2000);
-            }, 2000);
-        });
-
-        // Navbar scroll effect
         window.addEventListener('scroll', function() {
             const navbar = document.querySelector('nav');
             if (window.scrollY > 50) {
@@ -964,6 +782,20 @@
                 navbar.style.background = 'rgba(255, 255, 255, 0.9)';
                 navbar.style.backdropFilter = 'blur(20px)';
             }
+
+            const scrollToTopBtn = document.getElementById('scroll-to-top');
+            if (window.scrollY > 300) {
+                scrollToTopBtn.classList.add('show');
+            } else {
+                scrollToTopBtn.classList.remove('show');
+            }
+        });
+
+        document.getElementById('scroll-to-top').addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         });
     </script>
 </body>

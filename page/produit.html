@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEFEM - Tous nos Produits</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .anim-entree {
+            animation: entree 0.8s ease-out;
+        }
+        
+        @keyframes entree {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .anim-fade {
+            animation: fade 1s ease-out;
+        }
+        
+        @keyframes fade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .hover-zoom {
+            transition: transform 0.3s ease;
+        }
+        
+        .hover-zoom:hover {
+            transform: scale(1.05);
+        }
+        
+        .hero-produits {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 40vh;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-produits::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="white" opacity="0.1"><polygon points="0,0 1000,100 1000,0"/></svg>');
+            background-size: cover;
+        }
+        
+        .carte-prod {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .carte-prod:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+        
+        .btn-whatsapp {
+            background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+        }
+        
+        .btn-whatsapp:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
+        }
+        
+        .btn-tel {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-tel:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-connexion {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-connexion:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-inscription {
+            background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+        }
+        
+        .btn-inscription:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
+        }
+        
+        .hero-txt {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .filtre-btn {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .filtre-btn.actif {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .filtre-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+        
+        .champ-recherche {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .logo-site {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .prod-cache {
+            display: none;
+        }
+        
+        .navbar-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .tri-btn {
+            transition: all 0.3s ease;
+            background: white;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .tri-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-1px);
+        }
+        
+        .tri-btn.actif {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .compteur-resultats {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .badge-prix {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .badge-promo {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .aucun-resultat {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border: 2px dashed #cbd5e1;
+        }
+        
+        .btn-retour {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-retour:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(107, 114, 128, 0.3);
+        }
+        
+        .loading {
+            display: none;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .grille-fade {
+            animation: fade 0.5s ease-in-out;
+        }
+        
+        /* Bouton remonter en haut */
+        .btn-remonter {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .btn-remonter:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-remonter.show {
+            display: flex;
+            animation: fade 0.3s ease-in-out;
+        }
+        
+        @media (max-width: 640px) {
+            .hero-produits {
+                min-height: 30vh;
+            }
+            
+            .hero-txt {
+                font-size: 2rem;
+            }
+            
+            .carte-prod {
+                margin-bottom: 1rem;
+            }
+        }
+        
+        /* Responsive improvements */
+        @media (max-width: 768px) {
+            .hero-produits {
+                min-height: 35vh;
+                padding: 2rem 1rem;
+            }
+            
+            .hero-txt {
+                font-size: 2.5rem;
+                line-height: 1.2;
+            }
+            
+            .carte-prod {
+                margin-bottom: 1.5rem;
+                padding: 1rem;
+            }
+            
+            .carte-prod img {
+                height: 200px;
+            }
+            
+            .filtre-btn {
+                font-size: 0.75rem;
+                padding: 0.5rem 1rem;
+            }
+            
+            .tri-btn {
+                font-size: 0.75rem;
+                padding: 0.5rem 1rem;
+            }
+            
+            .champ-recherche {
+                font-size: 1rem;
+                padding: 0.75rem 1rem 0.75rem 3rem;
+            }
+            
+            .compteur-resultats {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .btn-whatsapp, .btn-tel {
+                font-size: 0.75rem;
+                padding: 0.5rem 0.75rem;
+            }
+            
+            .badge-prix {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+            }
+            
+            .badge-promo {
+                font-size: 0.625rem;
+                padding: 0.25rem 0.5rem;
+            }
+            
+            .btn-remonter {
+                bottom: 20px;
+                right: 20px;
+                width: 45px;
+                height: 45px;
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero-produits {
+                min-height: 30vh;
+                padding: 1.5rem 1rem;
+            }
+            
+            .hero-txt {
+                font-size: 2rem;
+                margin-bottom: 1rem;
+            }
+            
+            .carte-prod {
+                padding: 0.75rem;
+                margin-bottom: 1rem;
+            }
+            
+            .carte-prod img {
+                height: 180px;
+            }
+            
+            .filtre-btn {
+                font-size: 0.7rem;
+                padding: 0.4rem 0.8rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .tri-btn {
+                font-size: 0.7rem;
+                padding: 0.4rem 0.8rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .champ-recherche {
+                font-size: 0.9rem;
+                padding: 0.6rem 1rem 0.6rem 2.5rem;
+            }
+            
+            .btn-whatsapp, .btn-tel {
+                font-size: 0.7rem;
+                padding: 0.4rem 0.6rem;
+            }
+            
+            .badge-prix {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.4rem;
+            }
+            
+            .badge-promo {
+                font-size: 0.6rem;
+                padding: 0.2rem 0.4rem;
+            }
+            
+            .compteur-resultats {
+                padding: 0.75rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            .aucun-resultat {
+                padding: 2rem 1rem;
+            }
+            
+            .aucun-resultat h3 {
+                font-size: 1.5rem;
+            }
+            
+            .aucun-resultat p {
+                font-size: 0.9rem;
+            }
+            
+            .btn-remonter {
+                bottom: 15px;
+                right: 15px;
+                width: 40px;
+                height: 40px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .hero-txt {
+                font-size: 1.75rem;
+            }
+            
+            .carte-prod {
+                padding: 0.5rem;
+            }
+            
+            .carte-prod img {
+                height: 160px;
+            }
+            
+            .filtre-btn, .tri-btn {
+                font-size: 0.65rem;
+                padding: 0.3rem 0.6rem;
+            }
+            
+            .btn-whatsapp, .btn-tel {
+                font-size: 0.65rem;
+                padding: 0.3rem 0.5rem;
+            }
+            
+            .champ-recherche {
+                font-size: 0.85rem;
+                padding: 0.5rem 0.8rem 0.5rem 2.2rem;
+            }
+        }
+        
+        /* Tablet optimizations */
+        @media (min-width: 641px) and (max-width: 1024px) {
+            .hero-produits {
+                min-height: 35vh;
+            }
+            
+            .hero-txt {
+                font-size: 3.5rem;
+            }
+            
+            .carte-prod {
+                padding: 1.5rem;
+            }
+            
+            .carte-prod img {
+                height: 220px;
+            }
+            
+            .filtre-btn, .tri-btn {
+                font-size: 0.85rem;
+                padding: 0.6rem 1.2rem;
+            }
+            
+            .champ-recherche {
+                font-size: 1.1rem;
+                padding: 0.8rem 1.2rem 0.8rem 3.5rem;
+            }
+        }
+        
+        /* Large screen optimizations */
+        @media (min-width: 1025px) {
+            .hero-produits {
+                min-height: 45vh;
+            }
+            
+            .hero-txt {
+                font-size: 4rem;
+            }
+            
+            .carte-prod {
+                padding: 2rem;
+            }
+            
+            .carte-prod img {
+                height: 250px;
+            }
+            
+            .filtre-btn, .tri-btn {
+                font-size: 0.9rem;
+                padding: 0.7rem 1.4rem;
+            }
+            
+            .champ-recherche {
+                font-size: 1.2rem;
+                padding: 1rem 1.5rem 1rem 4rem;
+            }
+        }
+        
+        /* Landscape mobile optimizations */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .hero-produits {
+                min-height: 25vh;
+                padding: 1rem;
+            }
+            
+            .hero-txt {
+                font-size: 1.5rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .hero-produits p {
+                font-size: 0.9rem;
+                margin-bottom: 1rem;
+            }
+        }
+        
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .carte-prod img {
+                image-rendering: -webkit-optimize-contrast;
+                image-rendering: crisp-edges;
+            }
+        }
+        
+        /* Reduced motion for accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            .anim-entree, .anim-fade, .hover-zoom, .carte-prod {
+                animation: none;
+                transition: none;
+            }
+            
+            .carte-prod:hover {
+                transform: none;
+            }
+        }
+        
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .carte-prod {
+                background: rgba(30, 30, 30, 0.95);
+                border-color: rgba(255, 255, 255, 0.1);
+            }
+            
+            .champ-recherche {
+                background: rgba(30, 30, 30, 0.95);
+                color: white;
+            }
+            
+            .compteur-resultats {
+                background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+                border-color: rgba(102, 126, 234, 0.3);
+                color: white;
+            }
+            
+            .aucun-resultat {
+                background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+                border-color: #4b5563;
+                color: white;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="navbar-blur shadow-lg sticky top-0 z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-gem text-white text-lg"></i>
+                    </div>
+                    <h1 class="logo-site">MEFEM</h1>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="../index.html" class="text-gray-700 hover:text-purple-600 transition duration-300 font-medium">
+                        <i class="fas fa-home mr-2"></i>Accueil
+                    </a>
+                    <a href="#" class="text-purple-600 border-b-2 border-purple-600 transition duration-300 font-medium">
+                        <i class="fas fa-shopping-bag mr-2"></i>Produits
+                    </a>
+                    <a href="#contact" class="text-gray-700 hover:text-purple-600 transition duration-300 font-medium">
+                        <i class="fas fa-phone mr-2"></i>Contact
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="window.location.href='../auth/login.html'" class="btn-connexion hidden md:block text-white px-4 py-2 rounded-full font-medium hover:scale-105 transition duration-300">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Connexion
+                    </button>
+                    <button onclick="window.location.href='../auth/register.html'" class="btn-inscription hidden md:block text-white px-4 py-2 rounded-full font-medium hover:scale-105 transition duration-300">
+                        <i class="fas fa-user-plus mr-2"></i>Inscription
+                    </button>
+                    <button class="md:hidden" id="menu-burger">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Menu mobile -->
+    <div id="menu-mobile" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="bg-white h-full w-80 max-w-full transform translate-x-full transition-transform duration-300 ease-in-out">
+            <div class="flex justify-between items-center p-6 border-b">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-gem text-white text-sm"></i>
+                    </div>
+                    <h2 class="text-xl font-bold gradient-text">MEFEM</h2>
+                </div>
+                <button id="fermer-menu" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <nav class="p-6">
+                <ul class="space-y-6">
+                    <li>
+                        <a href="../index.html" class="flex items-center text-gray-700 hover:text-purple-600 transition duration-300 font-medium text-lg">
+                            <i class="fas fa-home mr-3 w-6"></i>Accueil
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center text-purple-600 transition duration-300 font-medium text-lg">
+                            <i class="fas fa-shopping-bag mr-3 w-6"></i>Produits
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#contact" class="flex items-center text-gray-700 hover:text-purple-600 transition duration-300 font-medium text-lg">
+                            <i class="fas fa-phone mr-3 w-6"></i>Contact
+                        </a>
+                    </li>
+                </ul>
+                <div class="mt-8 pt-6 border-t space-y-4">
+                    <button onclick="window.location.href='../auth/login.html'" class="w-full btn-connexion text-white px-4 py-3 rounded-full font-medium">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Connexion
+                    </button>
+                    <button onclick="window.location.href='../auth/register.html'" class="w-full btn-inscription text-white px-4 py-3 rounded-full font-medium">
+                        <i class="fas fa-user-plus mr-2"></i>Inscription
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-produits flex items-center justify-center">
+        <div class="max-w-4xl mx-auto text-center px-4 relative z-10">
+            <h2 class="text-4xl md:text-6xl font-bold text-white mb-4 hero-txt anim-fade">
+                <i class="fas fa-shopping-bags mr-3"></i>
+                Nos Produits
+            </h2>
+            <p class="text-lg md:text-xl text-white mb-6 anim-fade opacity-90">
+                Découvrez notre collection complète de produits premium
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <button onclick="window.location.href='../index.html'" class="btn-retour text-white px-6 py-3 rounded-full font-semibold hover-zoom">
+                    <i class="fas fa-arrow-left mr-2"></i>Retour Accueil
+                </button>
+                <button class="glassmorphism text-white px-6 py-3 rounded-full font-semibold hover:bg-white hover:text-purple-600 transition duration-300 hover-zoom">
+                    <i class="fas fa-filter mr-2"></i>Filtrer
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Contrôles -->
+    <section class="py-8 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Compteur de résultats -->
+            <div class="compteur-resultats rounded-lg p-4 mb-6 text-center">
+                <p class="text-gray-700 font-medium">
+                    <i class="fas fa-box mr-2 text-purple-600"></i>
+                    <span id="nb-resultats">0</span> produits trouvés
+                </p>
+            </div>
+
+            <!-- Barre de recherche -->
+            <div class="mb-8">
+                <div class="relative max-w-2xl mx-auto">
+                    <input type="text" 
+                           id="recherche" 
+                           placeholder="Rechercher un produit..." 
+                           class="champ-recherche w-full pl-12 pr-4 py-4 rounded-full border-0 focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-700 font-medium text-lg">
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></i>
+                    <button id="vider-recherche" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 hidden">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Filtres et Tri -->
+            <div class="flex flex-col lg:flex-row gap-6 mb-8">
+                <!-- Filtres par catégorie -->
+                <div class="flex-1">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-filter mr-2 text-purple-600"></i>
+                        Catégories
+                    </h3>
+                    <div class="flex flex-wrap gap-3">
+                        <button class="filtre-btn actif px-4 py-2 rounded-full font-medium bg-white text-gray-700 hover:bg-gray-50 text-sm" 
+                                onclick="filtrer('tous')">
+                            <i class="fas fa-th-large mr-1"></i>Tous
+                        </button>
+                        <button class="filtre-btn px-4 py-2 rounded-full font-medium bg-white text-gray-700 hover:bg-gray-50 text-sm" 
+                                onclick="filtrer('vetements')">
+                            <i class="fas fa-tshirt mr-1"></i>Vêtements
+                        </button>
+                        <button class="filtre-btn px-4 py-2 rounded-full font-medium bg-white text-gray-700 hover:bg-gray-50 text-sm" 
+                                onclick="filtrer('accessoires')">
+                            <i class="fas fa-shopping-bag mr-1"></i>Accessoires
+                        </button>
+                        <button class="filtre-btn px-4 py-2 rounded-full font-medium bg-white text-gray-700 hover:bg-gray-50 text-sm" 
+                                onclick="filtrer('chaussures')">
+                            <i class="fas fa-shoe-prints mr-1"></i>Chaussures
+                        </button>
+                        <button class="filtre-btn px-4 py-2 rounded-full font-medium bg-white text-gray-700 hover:bg-gray-50 text-sm" 
+                                onclick="filtrer('bijoux')">
+                            <i class="fas fa-gem mr-1"></i>Bijoux
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Tri -->
+                <div class="lg:w-80">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-sort mr-2 text-purple-600"></i>
+                        Trier par
+                    </h3>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="tri-btn actif px-3 py-2 rounded-lg font-medium text-sm" 
+                                onclick="trier('defaut')">
+                            <i class="fas fa-list mr-1"></i>Défaut
+                        </button>
+                        <button class="tri-btn px-3 py-2 rounded-lg font-medium text-sm" 
+                                onclick="trier('prix-asc')">
+                            <i class="fas fa-sort-amount-up mr-1"></i>Prix ↑
+                        </button>
+                        <button class="tri-btn px-3 py-2 rounded-lg font-medium text-sm" 
+                                onclick="trier('prix-desc')">
+                            <i class="fas fa-sort-amount-down mr-1"></i>Prix ↓
+                        </button>
+                        <button class="tri-btn px-3 py-2 rounded-lg font-medium text-sm" 
+                                onclick="trier('nom')">
+                            <i class="fas fa-sort-alpha-down mr-1"></i>Nom
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Indicateur de chargement -->
+            <div id="loading" class="loading text-center py-8">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                <p class="mt-2 text-gray-600">Chargement des produits...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Produits -->
+    <section id="produits" class="py-8 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div id="grille-produits" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Les produits seront générés dynamiquement -->
+            </div>
+            
+            <!-- Message aucun résultat -->
+            <div id="aucun-resultat" class="aucun-resultat hidden text-center py-16 rounded-lg">
+                <i class="fas fa-search text-6xl text-gray-400 mb-4"></i>
+                <h3 class="text-2xl font-bold text-gray-600 mb-2">Aucun produit trouvé</h3>
+                <p class="text-gray-500 mb-6">Essayez de modifier vos critères de recherche ou de filtrage</p>
+                <button onclick="reinitialiser()" class="btn-tel text-white px-6 py-3 rounded-full font-medium hover-zoom">
+                    <i class="fas fa-refresh mr-2"></i>Réinitialiser
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-gem text-white text-lg"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold">MEFEM</h3>
+                    </div>
+                    <p class="text-gray-400">
+                        Votre destination pour la mode premium en Côte d'Ivoire. Qualité, style et élégance.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Liens rapides</h4>
+                    <ul class="space-y-2">
+                        <li><a href="../index.html" class="text-gray-400 hover:text-white transition">Accueil</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Produits</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-white transition">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Catégories</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Vêtements</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Accessoires</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Chaussures</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Bijoux</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Suivez-nous</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center hover:bg-blue-500 transition">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center hover:bg-pink-700 transition">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center hover:bg-green-700 transition">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+                <p class="text-gray-400">
+                    © 2024 MEFEM. Tous droits réservés. Développé avec ❤️ en Côte d'Ivoire.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bouton remonter en haut -->
+    <button id="btn-remonter" class="btn-remonter hidden">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Variables courtes en français
+        const prods = [
+            {
+                id: 1,
+                nom: "Robe Élégante Premium",
+                desc: "Robe parfaite pour toutes occasions, confectionnée avec des matières premium de haute qualité.",
+                prix: 58000,
+                cat: "vetements",
+                img: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=300&fit=crop",
+                icone: "fas fa-tshirt",
+                promo: false
+            },
+            {
+                id: 2,
+                nom: "Sac Designer Luxe",
+                desc: "Sac à main luxueux en cuir véritable, parfait pour compléter votre look avec style.",
+                prix: 78000,
+                cat: "accessoires",
+                img: "https://images.unsplash.com/photo-1571945153237-4929e783af4a?w=400&h=300&fit=crop",
+                icone: "fas fa-shopping-bag",
+                promo: true
+            },
+            {
+                id: 3,
+                nom: "Sneakers Premium",
+                desc: "Chaussures haut de gamme alliant confort et style pour un look décontracté chic.",
+                prix: 49000,
+                cat: "chaussures",
+                img: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=300&fit=crop",
+                icone: "fas fa-shoe-prints",
+                promo: false
+            },
+            {
+                id: 4,
+                nom: "Montre Classique Or",
+                desc: "Montre élégante avec bracelet en cuir, parfaite pour un style intemporel et sophistiqué.",
+                prix: 130000,
+                cat: "accessoires",
+                img: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
+                icone: "fas fa-clock",
+                promo: false
+            },
+            {
+                id: 5,
+                nom: "Veste Tendance Mode",
+                desc: "Veste moderne et stylée, parfaite pour les journées fraîches avec un look décontracté et élégant.",
+                prix: 65000,
+                cat: "vetements",
+                img: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=300&fit=crop",
+                icone: "fas fa-tshirt",
+                promo: true
+            },
+            {
+                id: 6,
+                nom: "Collier Diamant Élégant",
+                desc: "Collier raffiné avec pierres précieuses, parfait pour sublimer votre tenue de soirée.",
+                prix: 95000,
+                cat: "bijoux",
+                img: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&h=300&fit=crop",
+                icone: "fas fa-gem",
+                promo: false
+            },
+            {
+                id: 7,
+                nom: "Chemise Business Premium",
+                desc: "Chemise professionnelle en coton de qualité supérieure, idéale pour le bureau.",
+                prix: 42000,
+                cat: "vetements",
+                img: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=300&fit=crop",
+                icone: "fas fa-tshirt",
+                promo: false
+            },
+            {
+                id: 8,
+                nom: "Bracelet Or 18 Carats",
+                desc: "Bracelet en or véritable, design minimaliste et élégant pour toutes occasions.",
+                prix: 180000,
+                cat: "bijoux",
+                img: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&h=300&fit=crop",
+                icone: "fas fa-gem",
+                promo: true
+            },
+            {
+                id: 9,
+                nom: "Escarpins Talon Aiguille",
+                desc: "Escarpins élégants avec talon aiguille, parfaits pour les occasions spéciales.",
+                prix: 72000,
+                cat: "chaussures",
+                img: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&h=300&fit=crop",
+                icone: "fas fa-shoe-prints",
+                promo: false
+            },
+            {
+                id: 10,
+                nom: "Écharpe Soie Luxueuse",
+                desc: "Écharpe en soie naturelle, douce et légère, parfaite pour compléter votre tenue.",
+                prix: 28000,
+                cat: "accessoires",
+                img: "https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?w=400&h=300&fit=crop",
+                icone: "fas fa-shopping-bag",
+                promo: false
+            },
+            {
+                id: 11,
+                nom: "Jean Premium Slim Fit",
+                desc: "Jean de qualité supérieure avec coupe slim fit, confortable et tendance.",
+                prix: 38000,
+                cat: "vetements",
+                img: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&h=300&fit=crop",
+                icone: "fas fa-tshirt",
+                promo: true
+            },
+            {
+                id: 12,
+                nom: "Bottes Cuir Classiques",
+                desc: "Bottes en cuir véritable, style intemporel et durable pour toutes les saisons.",
+                prix: 89000,
+                cat: "chaussures",
+                img: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=300&fit=crop",
+                icone: "fas fa-shoe-prints",
+                promo: false
+            }
+        ];
+
+        // Variables globales
+        let prodsFiltres = [...prods];
+        let filtreActuel = 'tous';
+        let triActuel = 'defaut';
+        let rechercheActuelle = '';
+
+        // Éléments DOM
+        const grilleProduits = document.getElementById('grille-produits');
+        const nbResultats = document.getElementById('nb-resultats');
+        const champRecherche = document.getElementById('recherche');
+        const btnViderRecherche = document.getElementById('vider-recherche');
+        const aucunResultat = document.getElementById('aucun-resultat');
+        const loading = document.getElementById('loading');
+        const menuBurger = document.getElementById('menu-burger');
+        const menuMobile = document.getElementById('menu-mobile');
+        const fermerMenu = document.getElementById('fermer-menu');
+        const btnRemonter = document.getElementById('btn-remonter');
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            afficherProduits();
+            initialiserMenuMobile();
+            initialiserRecherche();
+            initialiserBtnRemonter();
+        });
+
+        // Fonction d'affichage des produits
+        function afficherProduits() {
+            loading.classList.add('show');
+            
+            setTimeout(() => {
+                if (prodsFiltres.length === 0) {
+                    grilleProduits.innerHTML = '';
+                    aucunResultat.classList.remove('hidden');
+                    nbResultats.textContent = '0';
+                } else {
+                    aucunResultat.classList.add('hidden');
+                    grilleProduits.innerHTML = '';
+                    
+                    prodsFiltres.forEach((prod, index) => {
+                        const carte = creerCarteProduit(prod, index);
+                        grilleProduits.appendChild(carte);
+                    });
+                    
+                    nbResultats.textContent = prodsFiltres.length;
+                }
+                
+                loading.classList.remove('show');
+                grilleProduits.classList.add('grille-fade');
+            }, 300);
+        }
+
+        // Fonction de création d'une carte produit
+        function creerCarteProduit(prod, index) {
+            const carte = document.createElement('div');
+            carte.className = 'carte-prod rounded-xl p-6 shadow-lg anim-entree';
+            carte.style.animationDelay = `${index * 0.1}s`;
+            
+            const prixPromo = prod.promo ? Math.round(prod.prix * 0.8) : prod.prix;
+            
+            carte.innerHTML = `
+                <div class="relative mb-4">
+                    <img src="${prod.img}" alt="${prod.nom}" class="w-full h-48 object-cover rounded-lg hover-zoom">
+                    ${prod.promo ? '<span class="badge-promo absolute top-2 right-2">-20%</span>' : ''}
+                    <div class="absolute top-2 left-2 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md">
+                        <i class="${prod.icone} text-purple-600"></i>
+                    </div>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">${prod.nom}</h3>
+                <p class="text-gray-600 text-sm mb-4">${prod.desc}</p>
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center space-x-2">
+                        ${prod.promo ? `<span class="text-gray-400 line-through text-sm">${prod.prix.toLocaleString()} FCFA</span>` : ''}
+                        <span class="badge-prix">${prixPromo.toLocaleString()} FCFA</span>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="contacterWhatsApp('${prod.nom}')" class="btn-whatsapp flex-1 text-white px-4 py-2 rounded-lg font-medium text-sm">
+                        <i class="fab fa-whatsapp mr-2"></i>Commander
+                    </button>
+                    <button onclick="appeler('${prod.nom}')" class="btn-tel text-white px-4 py-2 rounded-lg font-medium text-sm">
+                        <i class="fas fa-phone mr-2"></i>Appeler
+                    </button>
+                </div>
+            `;
+            
+            return carte;
+        }
+
+        // Fonction de filtrage
+        function filtrer(categorie) {
+            filtreActuel = categorie;
+            
+            // Mise à jour des boutons de filtre
+            document.querySelectorAll('.filtre-btn').forEach(btn => {
+                btn.classList.remove('actif');
+            });
+            event.target.classList.add('actif');
+            
+            // Application du filtre
+            if (categorie === 'tous') {
+                prodsFiltres = prods.filter(prod => 
+                    prod.nom.toLowerCase().includes(rechercheActuelle.toLowerCase())
+                );
+            } else {
+                prodsFiltres = prods.filter(prod => 
+                    prod.cat === categorie && 
+                    prod.nom.toLowerCase().includes(rechercheActuelle.toLowerCase())
+                );
+            }
+            
+            // Application du tri
+            appliquerTri();
+            afficherProduits();
+        }
+
+        // Fonction de tri
+        function trier(type) {
+            triActuel = type;
+            
+            // Mise à jour des boutons de tri
+            document.querySelectorAll('.tri-btn').forEach(btn => {
+                btn.classList.remove('actif');
+            });
+            event.target.classList.add('actif');
+            
+            appliquerTri();
+            afficherProduits();
+        }
+
+        // Fonction d'application du tri
+        function appliquerTri() {
+            switch(triActuel) {
+                case 'prix-asc':
+                    prodsFiltres.sort((a, b) => a.prix - b.prix);
+                    break;
+                case 'prix-desc':
+                    prodsFiltres.sort((a, b) => b.prix - a.prix);
+                    break;
+                case 'nom':
+                    prodsFiltres.sort((a, b) => a.nom.localeCompare(b.nom));
+                    break;
+                default:
+                    // Tri par défaut (ordre d'origine)
+                    prodsFiltres.sort((a, b) => a.id - b.id);
+            }
+        }
+
+        // Fonction de recherche
+        function rechercher() {
+            rechercheActuelle = champRecherche.value.trim();
+            
+            if (rechercheActuelle === '') {
+                btnViderRecherche.classList.add('hidden');
+            } else {
+                btnViderRecherche.classList.remove('hidden');
+            }
+            
+            // Réapplication du filtre actuel avec la recherche
+            if (filtreActuel === 'tous') {
+                prodsFiltres = prods.filter(prod => 
+                    prod.nom.toLowerCase().includes(rechercheActuelle.toLowerCase())
+                );
+            } else {
+                prodsFiltres = prods.filter(prod => 
+                    prod.cat === filtreActuel && 
+                    prod.nom.toLowerCase().includes(rechercheActuelle.toLowerCase())
+                );
+            }
+            
+            appliquerTri();
+            afficherProduits();
+        }
+
+        // Fonction de réinitialisation
+        function reinitialiser() {
+            filtreActuel = 'tous';
+            triActuel = 'defaut';
+            rechercheActuelle = '';
+            champRecherche.value = '';
+            
+            // Réinitialisation des boutons
+            document.querySelectorAll('.filtre-btn').forEach(btn => {
+                btn.classList.remove('actif');
+            });
+            document.querySelector('.filtre-btn').classList.add('actif');
+            
+            document.querySelectorAll('.tri-btn').forEach(btn => {
+                btn.classList.remove('actif');
+            });
+            document.querySelector('.tri-btn').classList.add('actif');
+            
+            btnViderRecherche.classList.add('hidden');
+            
+            prodsFiltres = [...prods];
+            afficherProduits();
+        }
+
+        // Fonction de contact WhatsApp
+        function contacterWhatsApp(nomProduit) {
+            const message = `Bonjour ! Je suis intéressé(e) par le produit "${nomProduit}" de MEFEM. Pouvez-vous me donner plus d'informations ?`;
+            const url = `https://wa.me/2250700000000?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        }
+
+        // Fonction d'appel
+        function appeler(nomProduit) {
+            const message = `Appel pour le produit "${nomProduit}"`;
+            if (confirm(`${message}\n\nVoulez-vous appeler le numéro de MEFEM ?`)) {
+                window.location.href = 'tel:+2250700000000';
+            }
+        }
+
+        // Initialisation du menu mobile
+        function initialiserMenuMobile() {
+            menuBurger.addEventListener('click', () => {
+                menuMobile.classList.remove('hidden');
+                setTimeout(() => {
+                    menuMobile.querySelector('.transform').classList.remove('translate-x-full');
+                }, 10);
+            });
+            
+            fermerMenu.addEventListener('click', () => {
+                menuMobile.querySelector('.transform').classList.add('translate-x-full');
+                setTimeout(() => {
+                    menuMobile.classList.add('hidden');
+                }, 300);
+            });
+            
+            menuMobile.addEventListener('click', (e) => {
+                if (e.target === menuMobile) {
+                    fermerMenu.click();
+                }
+            });
+        }
+
+        // Initialisation de la recherche
+        function initialiserRecherche() {
+            champRecherche.addEventListener('input', rechercher);
+            
+            btnViderRecherche.addEventListener('click', () => {
+                champRecherche.value = '';
+                rechercher();
+            });
+            
+            // Recherche avec la touche Entrée
+            champRecherche.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    rechercher();
+                }
+            });
+        }
+
+        // Initialisation du bouton remonter
+        function initialiserBtnRemonter() {
+            let lastScrollY = window.scrollY;
+
+            window.addEventListener('scroll', () => {
+                const currentScrollY = window.scrollY;
+                if (currentScrollY > lastScrollY) {
+                    btnRemonter.classList.add('show');
+                } else {
+                    btnRemonter.classList.remove('show');
+                }
+                lastScrollY = currentScrollY;
+            });
+
+            btnRemonter.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // Animation au scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('anim-entree');
+                }
+            });
+        }, observerOptions);
+
+        // Observer les cartes produits
+        document.addEventListener('DOMContentLoaded', () => {
+            const cartes = document.querySelectorAll('.carte-prod');
+            cartes.forEach(carte => observer.observe(carte));
+        });
+    </script>
+</body>
+</html>
