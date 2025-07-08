@@ -494,17 +494,29 @@
                 button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Connexion en cours...';
                 button.disabled = true;
                 
-                // Simuler l'authentification
+                // Simuler l'authentification avec vérification du rôle
                 setTimeout(() => {
+                    // Simuler une vérification d'authentification
+                    // Ici vous pourriez faire un appel API pour vérifier les credentials
+                    
+                    // Déterminer le type d'utilisateur basé sur le numéro de téléphone ou d'autres critères
+                    // Pour cet exemple, on utilise une logique simple basée sur le numéro de téléphone
+                    const isAdmin = determineUserRole(telephone, motDePasse);
+                    
                     // Simuler une authentification réussie
                     button.innerHTML = '<i class="fas fa-check mr-2"></i>Connexion réussie !';
                     button.classList.remove('btn-primary');
                     button.classList.add('bg-green-500');
                     
                     setTimeout(() => {
-                        alert('Connexion réussie ! Redirection vers votre tableau de bord...');
-                        // Ici vous pourriez rediriger vers le tableau de bord
-                        // window.location.href = '/dashboard';
+                        // Rediriger vers le bon tableau de bord selon le rôle
+                        if (isAdmin) {
+                            alert('Connexion réussie ! Redirection vers le tableau de bord administrateur...');
+                            window.location.href = '../dashAdmin/dashAdmin.html';
+                        } else {
+                            alert('Connexion réussie ! Redirection vers votre tableau de bord utilisateur...');
+                            window.location.href = '../dashUser/dashUser.html';
+                        }
                     }, 1000);
                 }, 2000);
             } else {
@@ -515,6 +527,32 @@
                 }, 500);
             }
         });
+        
+        // Fonction pour déterminer le rôle de l'utilisateur
+        function determineUserRole(telephone, motDePasse) {
+            // Logique pour déterminer si l'utilisateur est admin ou utilisateur normal
+            // Vous pouvez adapter cette logique selon vos besoins
+            
+            // Exemple 1: Basé sur le numéro de téléphone (si vous avez des numéros admin spécifiques)
+            const adminPhones = ['+22507000000', '+22508000000', '07000000', '08000000'];
+            if (adminPhones.includes(telephone.replace(/\s/g, ''))) {
+                return true; // Admin
+            }
+            
+            // Exemple 2: Basé sur un mot de passe spécial
+            const adminPasswords = ['admin123', 'admin2024', 'superadmin'];
+            if (adminPasswords.includes(motDePasse)) {
+                return true; // Admin
+            }
+            
+            // Exemple 3: Basé sur une combinaison téléphone + mot de passe
+            if (telephone.includes('07000000') && motDePasse === 'admin123') {
+                return true; // Admin
+            }
+            
+            // Par défaut, considérer comme utilisateur normal
+            return false; // Utilisateur normal
+        }
         
         // Validation du formulaire mot de passe oublié
         document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {

@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historique des Articles - MEFEM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .sidebar {
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+        }
+        
+        .sidebar-item {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sidebar-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .sidebar-item:hover::before {
+            left: 100%;
+        }
+        
+        .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .sidebar-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid white;
+        }
+        
+        .article-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .article-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .article-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        
+        .search-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .search-input {
+            border: none;
+            outline: none;
+            background: transparent;
+            padding: 16px 20px;
+            font-size: 16px;
+            width: 100%;
+            border-radius: 20px;
+        }
+        
+        .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 600;
+        }
+        
+        .btn-gradient:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-edit {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-edit:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+        
+        .btn-delete {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-delete:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .main-content {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+        
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            animation: modalSlide 0.3s ease;
+        }
+        
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .form-input {
+            transition: all 0.3s ease;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            width: 100%;
+        }
+        
+        .form-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+        }
+        
+        .form-textarea {
+            transition: all 0.3s ease;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            resize: vertical;
+            min-height: 100px;
+            width: 100%;
+        }
+        
+        .form-textarea:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+        }
+        
+        .stats-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        
+        .empty-state {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            padding: 60px 40px;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-tab {
+            padding: 10px 20px;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .filter-tab:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+        
+        .filter-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 50;
+                height: 100vh;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+            }
+            
+            .article-card {
+                margin-bottom: 20px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                padding: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .filter-tabs {
+                justify-content: center;
+            }
+            
+            .filter-tab {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .article-card {
+                padding: 15px;
+            }
+            
+            .article-card .flex {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .article-card img {
+                width: 100%;
+                height: 200px;
+                object-fit: cover;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Overlay pour mobile -->
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden"></div>
+    
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar fixed left-0 top-0 w-64 h-full shadow-2xl z-50">
+        <div class="p-6 border-b border-white/20">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                    <i class="fas fa-gem text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-white text-2xl font-bold">MEFEM</h1>
+                    <p class="text-white/80 text-sm">Dashboard Admin</p>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="mt-6">
+            <ul class="space-y-2 px-4">
+                <li>
+                    <a href="dashUser.html" class="sidebar-item flex items-center px-4 py-3 text-white rounded-lg block">
+                        <i class="fas fa-tachometer-alt w-6 text-center mr-3"></i>
+                        <span>Tableau de Bord</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="dashAjout.html" class="sidebar-item flex items-center px-4 py-3 text-white rounded-lg block">
+                        <i class="fas fa-plus-circle w-6 text-center mr-3"></i>
+                        <span>Ajouter un Article</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="dashHistorique.html" class="sidebar-item active flex items-center px-4 py-3 text-white rounded-lg block">
+                        <i class="fas fa-history w-6 text-center mr-3"></i>
+                        <span>Historique</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="dashProfile.html" class="sidebar-item flex items-center px-4 py-3 text-white rounded-lg block">
+                        <i class="fas fa-user-circle w-6 text-center mr-3"></i>
+                        <span>Profile</span>
+                    </a>
+                </li>
+                <li class="pt-4 border-t border-white/20">
+                    <a href="../auth/login.html" class="sidebar-item flex items-center px-4 py-3 text-white rounded-lg block hover:bg-red-500/20">
+                        <i class="fas fa-sign-out-alt w-6 text-center mr-3"></i>
+                        <span>Déconnexion</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content ml-64 transition-all duration-300">
+        <!-- Header -->
+        <header class="bg-white/90 backdrop-blur-xl shadow-lg sticky top-0 z-30">
+            <div class="flex items-center justify-between px-6 py-4">
+                <div class="flex items-center space-x-4">
+                    <button id="toggle-sidebar" class="md:hidden text-gray-600 hover:text-gray-800">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <div>
+                        <h1 class="text-2xl font-bold gradient-text">Historique des Articles</h1>
+                        <p class="text-gray-600 text-sm">Gérez tous vos articles publiés</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <button class="p-2 text-gray-600 hover:text-gray-800 relative">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span class="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"></span>
+                        </button>
+                    </div>
+                    <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-white"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Stats Section -->
+        <section class="py-6 px-6">
+            <div class="max-w-7xl mx-auto">
+                <div class="stats-grid grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="stats-card p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm font-medium">Total Articles</p>
+                                <p class="text-3xl font-bold text-gray-800" id="totalArticles">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-box text-white text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stats-card p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm font-medium">Valeur Totale</p>
+                                <p class="text-3xl font-bold text-gray-800" id="totalValue">0 ₣</p>
+                            </div>
+                            <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-coins text-white text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stats-card p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm font-medium">Ce Mois</p>
+                                <p class="text-3xl font-bold text-gray-800" id="monthlyArticles">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-calendar-alt text-white text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stats-card p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm font-medium">Prix Moyen</p>
+                                <p class="text-3xl font-bold text-gray-800" id="averagePrice">0 ₣</p>
+                            </div>
+                            <div class="w-12 h-12 bg-gradient-to-r from-pink-500 to-violet-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-chart-line text-white text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Search and Filter Section -->
+        <section class="px-6 mb-6">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row gap-6 items-center justify-between mb-6">
+                    <div class="search-container flex-1 max-w-md">
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" 
+                                   id="searchInput" 
+                                   class="search-input pl-14 pr-4" 
+                                   placeholder="Rechercher un article...">
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <button class="btn-gradient text-white font-semibold py-3 px-6 rounded-lg inline-flex items-center space-x-2" onclick="exportData()">
+                            <i class="fas fa-download"></i>
+                            <span>Exporter</span>
+                        </button>
+                        <button class="btn-gradient text-white font-semibold py-3 px-6 rounded-lg inline-flex items-center space-x-2" onclick="window.location.href='dashAjout.html'">
+                            <i class="fas fa-plus"></i>
+                            <span>Ajouter</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Filter tabs -->
+                <div class="filter-tabs">
+                    <div class="filter-tab active" data-filter="all">
+                        <i class="fas fa-list mr-2"></i>
+                        Tous
+                    </div>
+                    <div class="filter-tab" data-filter="recent">
+                        <i class="fas fa-clock mr-2"></i>
+                        Récents
+                    </div>
+                    <div class="filter-tab" data-filter="price-high">
+                        <i class="fas fa-arrow-up mr-2"></i>
+                        Prix Élevé
+                    </div>
+                    <div class="filter-tab" data-filter="price-low">
+                        <i class="fas fa-arrow-down mr-2"></i>
+                        Prix Faible
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Articles Section -->
+        <section class="px-6 pb-8">
+            <div class="max-w-7xl mx-auto">
+                <!-- Table Container -->
+                <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                                <tr>
+                                    <th class="px-6 py-4 text-left font-semibold">
+                                        Image
+                                    </th>
+                                    <th class="px-6 py-4 text-left font-semibold">
+                                        Nom
+                                    </th>
+                                    <th class="px-6 py-4 text-left font-semibold">
+                                        Prix
+                                    </th>
+                                    <th class="px-6 py-4 text-left font-semibold">
+                                        WhatsApp
+                                    </th>
+                                    <th class="px-6 py-4 text-left font-semibold">
+                                        Date
+                                    </th>
+                                    <th class="px-6 py-4 text-left font-semibold">
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="articlesTableBody">
+                                <!-- Les données seront générées ici -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Empty state -->
+                <div id="emptyState" class="empty-state hidden">
+                    <div class="text-center">
+                        <i class="fas fa-box-open text-8xl text-gray-300 mb-6"></i>
+                        <h3 class="text-2xl font-bold text-gray-600 mb-4">Aucun article trouvé</h3>
+                        <p class="text-gray-500 mb-8">Vous n'avez pas encore ajouté d'articles ou aucun article ne correspond à votre recherche.</p>
+                        <button class="btn-gradient text-white font-semibold py-3 px-8 rounded-lg inline-flex items-center space-x-2" onclick="window.location.href='dashAjout.html'">
+                            <i class="fas fa-plus"></i>
+                            <span>Ajouter votre premier article</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Modal de modification -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold gradient-text">
+                    <i class="fas fa-edit mr-2"></i>
+                    Modifier l'Article
+                </h2>
+                <button class="text-gray-400 hover:text-gray-600 text-2xl" onclick="closeEditModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="editForm" class="space-y-4">
+                <input type="hidden" id="editArticleId">
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-tag mr-2 text-purple-500"></i>
+                        Nom de l'article
+                    </label>
+                    <input type="text" id="editArticleName" class="form-input" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-coins mr-2 text-green-500"></i>
+                        Prix (FCFA)
+                    </label>
+                    <input type="number" id="editArticlePrice" class="form-input" min="0" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fab fa-whatsapp mr-2 text-green-500"></i>
+                        Numéro WhatsApp
+                    </label>
+                    <input type="tel" id="editWhatsappNumber" class="form-input" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-align-left mr-2 text-blue-500"></i>
+                        Description
+                    </label>
+                    <textarea id="editArticleDescription" class="form-textarea" required></textarea>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-image mr-2 text-purple-500"></i>
+                        Image de l'article
+                    </label>
+                    <div class="flex items-center space-x-4">
+                        <img id="editArticleImagePreview" src="" alt="Aperçu" class="w-20 h-20 object-cover rounded-lg border-2 border-gray-200">
+                        <div class="flex-1">
+                            <input type="file" id="editArticleImage" class="form-input" accept="image/*">
+                            <p class="text-xs text-gray-500 mt-1">Format: JPG, PNG, GIF. Taille max: 5MB</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex gap-4 pt-4">
+                    <button type="submit" class="btn-edit text-white font-semibold py-3 px-6 rounded-lg flex-1 inline-flex items-center justify-center space-x-2">
+                        <i class="fas fa-save"></i>
+                        <span>Enregistrer</span>
+                    </button>
+                    <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg flex-1 inline-flex items-center justify-center space-x-2" onclick="closeEditModal()">
+                        <i class="fas fa-times"></i>
+                        <span>Annuler</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal de confirmation de suppression -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content max-w-md">
+            <div class="text-center">
+                <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-exclamation-triangle text-red-500 text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Confirmer la suppression</h3>
+                <p class="text-gray-600 mb-6">Êtes-vous sûr de vouloir supprimer cet article ? Cette action est irréversible.</p>
+                <div class="flex gap-4">
+                    <button id="confirmDelete" class="btn-delete text-white font-semibold py-3 px-6 rounded-lg flex-1 inline-flex items-center justify-center space-x-2">
+                        <i class="fas fa-trash"></i>
+                        <span>Supprimer</span>
+                    </button>
+                    <button class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg flex-1 inline-flex items-center justify-center space-x-2" onclick="closeDeleteModal()">
+                        <i class="fas fa-times"></i>
+                        <span>Annuler</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Données simulées des articles
+        let articles = [
+            {
+                id: 1,
+                name: "iPhone 14 Pro Max",
+                price: 850000,
+                whatsapp: "+225 01 23 45 67 89",
+                description: "iPhone 14 Pro Max 128GB, état neuf, avec tous les accessoires d'origine. Boîte, chargeur, écouteurs inclus.",
+                image: "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=400&h=300&fit=crop",
+                date: new Date('2024-01-15'),
+                views: 245
+            },
+            {
+                id: 2,
+                name: "Samsung Galaxy S23 Ultra",
+                price: 750000,
+                whatsapp: "+225 07 89 12 34 56",
+                description: "Samsung Galaxy S23 Ultra 256GB, couleur noir, excellent état. Protégé par une coque depuis l'achat.",
+                image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=400&h=300&fit=crop",
+                date: new Date('2024-01-10'),
+                views: 189
+            },
+            {
+                id: 3,
+                name: "MacBook Pro M2",
+                price: 1200000,
+                whatsapp: "+225 05 67 89 01 23",
+                description: "MacBook Pro 13' avec puce M2, 8GB RAM, 512GB SSD. Parfait pour le travail et les études.",
+                image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=300&fit=crop",
+                date: new Date('2024-01-08'),
+                views: 312
+            },
+            {
+                id: 4,
+                name: "PlayStation 5",
+                price: 400000,
+                whatsapp: "+225 01 45 67 89 12",
+                description: "PlayStation 5 avec lecteur de disque, état neuf. Vendu avec 2 manettes et 3 jeux.",
+                image: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=400&h=300&fit=crop",
+                date: new Date('2024-01-05'),
+                views: 156
+            },
+            {
+                id: 5,
+                name: "iPad Air 5ème génération",
+                price: 520000,
+                whatsapp: "+225 07 12 34 56 78",
+                description: "iPad Air 64GB Wi-Fi, couleur bleu ciel. Écran 10.9 pouces, parfait pour le dessin et la productivité.",
+                image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400&h=300&fit=crop",
+                date: new Date('2024-01-03'),
+                views: 203
+            },
+            {
+                id: 6,
+                name: "Apple Watch Series 8",
+                price: 280000,
+                whatsapp: "+225 05 98 76 54 32",
+                description: "Apple Watch Series 8 45mm GPS, bracelet sport noir. Suivi de santé avancé et résistance à l'eau.",
+                image: "https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=400&h=300&fit=crop",
+                date: new Date('2024-01-01'),
+                views: 127
+            }
+        ];
+        
+        let filteredArticles = [...articles];
+        let currentFilter = 'all';
+        let articleToDelete = null;
+        
+        // Toggle sidebar pour mobile
+        const toggleSidebar = document.getElementById('toggle-sidebar');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        
+        toggleSidebar.addEventListener('click', function() {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        });
+        
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('open');
+            overlay.classList.add('hidden');
+        });
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+            displayArticles();
+            setupEventListeners();
+        });
+        
+        // Mise à jour des statistiques
+        function updateStats() {
+            const totalArticles = articles.length;
+            const totalValue = articles.reduce((sum, article) => sum + article.price, 0);
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            const monthlyArticles = articles.filter(article => 
+                article.date.getMonth() === currentMonth && 
+                article.date.getFullYear() === currentYear
+            ).length;
+            const averagePrice = totalArticles > 0 ? totalValue / totalArticles : 0;
+            
+            document.getElementById('totalArticles').textContent = totalArticles;
+            document.getElementById('totalValue').textContent = formatPrice(totalValue);
+            document.getElementById('monthlyArticles').textContent = monthlyArticles;
+            document.getElementById('averagePrice').textContent = formatPrice(averagePrice);
+        }
+        
+        // Formatage du prix
+        function formatPrice(price) {
+            return new Intl.NumberFormat('fr-FR').format(price) + ' ₣';
+        }
+        
+        // Formatage de la date
+        function formatDate(date) {
+            return new Intl.DateTimeFormat('fr-FR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            }).format(date);
+        }
+        
+        // Affichage des articles
+        function displayArticles() {
+            const tableBody = document.getElementById('articlesTableBody');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (filteredArticles.length === 0) {
+                tableBody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            
+            tableBody.innerHTML = filteredArticles.map(article => `
+                <tr class="hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100">
+                    <td class="px-6 py-4">
+                        <img src="${article.image}" 
+                             alt="${article.name}" 
+                             class="w-16 h-16 object-cover rounded-lg shadow-sm">
+                    </td>
+                    <td class="px-6 py-4">
+                        <div>
+                            <h3 class="font-semibold text-gray-800">${article.name}</h3>
+                            <p class="text-sm text-gray-500 line-clamp-2">${article.description}</p>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="text-lg font-bold text-green-600">${formatPrice(article.price)}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center space-x-2">
+                            <i class="fab fa-whatsapp text-green-500"></i>
+                            <span class="text-sm text-gray-700">${article.whatsapp}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-calendar-alt text-gray-400"></i>
+                            <span class="text-sm text-gray-700">${formatDate(article.date)}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex space-x-2">
+                            <button class="btn-edit text-white font-semibold py-2 px-3 rounded-lg inline-flex items-center space-x-1 text-sm" 
+                                    onclick="openEditModal(${article.id})" title="Modifier">
+                                <i class="fas fa-edit"></i>
+                                <span class="hidden md:inline">Modifier</span>
+                            </button>
+                            <button class="btn-delete text-white font-semibold py-2 px-3 rounded-lg inline-flex items-center space-x-1 text-sm" 
+                                    onclick="openDeleteModal(${article.id})" title="Supprimer">
+                                <i class="fas fa-trash"></i>
+                                <span class="hidden md:inline">Supprimer</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Configuration des événements
+        function setupEventListeners() {
+            // Recherche
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                filterArticles(searchTerm);
+            });
+            
+            // Filtres
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    currentFilter = this.dataset.filter;
+                    applyFilter();
+                });
+            });
+            
+            // Formulaire de modification
+            document.getElementById('editForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveArticle();
+            });
+        }
+        
+        // Filtrage des articles
+        function filterArticles(searchTerm) {
+            filteredArticles = articles.filter(article => 
+                article.name.toLowerCase().includes(searchTerm) ||
+                article.description.toLowerCase().includes(searchTerm)
+            );
+            applyFilter();
+        }
+        
+        // Application des filtres
+        function applyFilter() {
+            let filtered = [...filteredArticles];
+            
+            switch(currentFilter) {
+                case 'recent':
+                    filtered.sort((a, b) => b.date - a.date);
+                    break;
+                case 'price-high':
+                    filtered.sort((a, b) => b.price - a.price);
+                    break;
+                case 'price-low':
+                    filtered.sort((a, b) => a.price - b.price);
+                    break;
+                default:
+                    filtered.sort((a, b) => b.date - a.date);
+            }
+            
+            filteredArticles = filtered;
+            displayArticles();
+        }
+        
+        // Ouverture du modal de modification
+        function openEditModal(articleId) {
+            const article = articles.find(a => a.id === articleId);
+            if (!article) return;
+            
+            document.getElementById('editArticleId').value = article.id;
+            document.getElementById('editArticleName').value = article.name;
+            document.getElementById('editArticlePrice').value = article.price;
+            document.getElementById('editWhatsappNumber').value = article.whatsapp;
+            document.getElementById('editArticleDescription').value = article.description;
+            
+            document.getElementById('editModal').style.display = 'block';
+        }
+        
+        // Fermeture du modal de modification
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+        
+        // Sauvegarde de l'article modifié
+        function saveArticle() {
+            const articleId = parseInt(document.getElementById('editArticleId').value);
+            const articleIndex = articles.findIndex(a => a.id === articleId);
+            
+            if (articleIndex === -1) return;
+            
+            articles[articleIndex] = {
+                ...articles[articleIndex],
+                name: document.getElementById('editArticleName').value,
+                price: parseFloat(document.getElementById('editArticlePrice').value),
+                whatsapp: document.getElementById('editWhatsappNumber').value,
+                description: document.getElementById('editArticleDescription').value
+            };
+            
+            updateStats();
+            applyFilter();
+            closeEditModal();
+            
+            // Notification de succès
+            showNotification('Article modifié avec succès !', 'success');
+        }
+        
+        // Ouverture du modal de suppression
+        function openDeleteModal(articleId) {
+            articleToDelete = articleId;
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+        
+        // Fermeture du modal de suppression
+        function closeDeleteModal() {
+            articleToDelete = null;
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+        
+        // Confirmation de suppression
+        document.getElementById('confirmDelete').addEventListener('click', function() {
+            if (articleToDelete) {
+                const articleIndex = articles.findIndex(a => a.id === articleToDelete);
+                if (articleIndex !== -1) {
+                    articles.splice(articleIndex, 1);
+                    updateStats();
+                    applyFilter();
+                    showNotification('Article supprimé avec succès !', 'success');
+                }
+            }
+            closeDeleteModal();
+        });
+        
+        // Fermeture des modals en cliquant à l'extérieur
+        window.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        });
+        
+        // Notification système
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+            } text-white`;
+            notification.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : 'info'}-circle"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+        
+        // Exportation des données
+        function exportData() {
+            const csvContent = "data:text/csv;charset=utf-8," + 
+                "Nom,Prix,WhatsApp,Description,Date\n" +
+                articles.map(article => 
+                    `"${article.name}",${article.price},"${article.whatsapp}","${article.description}","${formatDate(article.date)}"`
+                ).join('\n');
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'articles_export.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('Export réussi !', 'success');
+        }
+        
+        // Gestion des liens sidebar
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (!this.getAttribute('href').startsWith('#')) {
+                    return;
+                }
+                
+                document.querySelectorAll('.sidebar-item').forEach(el => {
+                    el.classList.remove('active');
+                });
+                
+                this.classList.add('active');
+                
+                if (window.innerWidth < 768) {
+                    sidebar.classList.remove('open');
+                    overlay.classList.add('hidden');
+                }
+            });
+        });
+        
+        // Responsive
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 768) {
+                sidebar.classList.remove('open');
+                overlay.classList.add('hidden');
+            }
+        });
+        
+        // Gestion du clavier
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeEditModal();
+                closeDeleteModal();
+            }
+        });
+        
+        // Animation au scroll
+        window.addEventListener('scroll', function() {
+            const cards = document.querySelectorAll('.article-card');
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                if (rect.top < window.innerHeight && rect.bottom > 0) {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

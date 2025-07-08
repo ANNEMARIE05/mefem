@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Profil - MEFEM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .sidebar {
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+        }
+        
+        .sidebar-item {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sidebar-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .sidebar-item:hover::before {
+            left: 100%;
+        }
+        
+        .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .sidebar-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid white;
+        }
+        
+        .profile-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .profile-container:hover {
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .form-input {
+            transition: all 0.3s ease;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        
+        .form-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: rgba(255, 255, 255, 0.95);
+            outline: none;
+        }
+        
+        .form-input:disabled {
+            background: rgba(241, 245, 249, 0.8);
+            cursor: not-allowed;
+        }
+        
+        .form-select {
+            transition: all 0.3s ease;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        
+        .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: rgba(255, 255, 255, 0.95);
+            outline: none;
+        }
+        
+        .form-select:disabled {
+            background: rgba(241, 245, 249, 0.8);
+            cursor: not-allowed;
+        }
+        
+        .btn-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 600;
+        }
+        
+        .btn-gradient:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-gradient:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-outline {
+            border: 2px solid #667eea;
+            color: #667eea;
+            background: transparent;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 600;
+        }
+        
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .main-content {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+        
+        .profile-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            color: white;
+            margin-bottom: 2rem;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .plan-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .success-message {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideDown 0.5s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 50;
+                height: 100vh;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+            }
+            
+            .profile-container {
+                margin: 20px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Overlay pour mobile -->
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden"></div>
+    
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar fixed left-0 top-0 w-64 h-full shadow-2xl z-50">
+        <div class="p-6 border-b border-white/20">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                    <i class="fas fa-gem text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-white text-2xl font-bold">MEFEM</h1>
+                    <p class="text-white/80 text-sm">Dashboard Admin</p>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="mt-6">
+            <ul class="space-y-2 px-4">
+                <li>
+                    <a href="dashUser.html" class="sidebar-item flex items-center px-4 py-3 text-white rounded-lg block">
+                        <i class="fas fa-tachometer-alt w-6 text-center mr-3"></i>
+                        <span>Tableau de Bord</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="dashAjout.html" class="sidebar-item flex items-center px-4 py-3 text-white rounded-lg block">
+                        <i class="fas fa-plus-circle w-6 text-center mr-3"></i>
+                        <span>Ajouter un Article</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="dashHistorique.html" class="sidebar-item flex items-center px-4 py-3 text-white rounded-lg block">
+                        <i class="fas fa-history w-6 text-center mr-3"></i>
+                        <span>Historique</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="dashProfile.html" class="sidebar-item active flex items-center px-4 py-3 text-white rounded-lg block">
+                        <i class="fas fa-user-circle w-6 text-center mr-3"></i>
+                        <span>Profile</span>
+                    </a>
+                </li>
+                <li class="pt-4 border-t border-white/20">
+                    <a href="../auth/login.html" class="sidebar-item flex items-center px-4 py-3 text-white rounded-lg block hover:bg-red-500/20">
+                        <i class="fas fa-sign-out-alt w-6 text-center mr-3"></i>
+                        <span>Déconnexion</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content ml-64 transition-all duration-300">
+        <!-- Header -->
+        <header class="bg-white/90 backdrop-blur-xl shadow-lg sticky top-0 z-30">
+            <div class="flex items-center justify-between px-6 py-4">
+                <div class="flex items-center space-x-4">
+                    <button id="toggle-sidebar" class="md:hidden text-gray-600 hover:text-gray-800">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <div>
+                        <h1 class="text-2xl font-bold gradient-text">Mon Profil</h1>
+                        <p class="text-gray-600 text-sm">Gérez vos informations personnelles</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <button class="p-2 text-gray-600 hover:text-gray-800 relative">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span class="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"></span>
+                        </button>
+                    </div>
+                    <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-white"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Profile Section -->
+        <section class="py-8 px-6">
+            <div class="max-w-6xl mx-auto">
+                
+                <!-- Profile Header -->
+                <div class="profile-header fade-in">
+                    <div class="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-6">
+                        <div class="profile-avatar">
+                            <span id="avatarInitials">MK</span>
+                        </div>
+                        <div class="text-center md:text-left flex-1">
+                            <h2 class="text-3xl font-bold mb-2" id="profileName">Mme. Marie Koné</h2>
+                            <p class="text-xl opacity-90 mb-3" id="profileSpecialty">Commerçante</p>
+                            <div class="flex flex-wrap justify-center md:justify-start gap-3">
+                                <div class="plan-badge">
+                                    <i class="fas fa-crown mr-2"></i>
+                                    <span id="currentPlan">Plan Mensuel</span>
+                                </div>
+                                <div class="plan-badge">
+                                    <i class="fas fa-calendar mr-2"></i>
+                                    <span>Membre depuis Jan 2024</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <button id="editButton" class="bg-white/20 hover:bg-white/30 text-white px-6 py-2 rounded-lg transition-all">
+                                <i class="fas fa-edit mr-2"></i>
+                                Modifier
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Profile Form -->
+                <div class="profile-container p-8 fade-in">
+                    <div class="success-message" id="successMessage">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        Profil mis à jour avec succès !
+                    </div>
+                    
+                    <form id="profileForm" class="space-y-8">
+                        <!-- Informations Personnelles -->
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold gradient-text mb-6 flex items-center">
+                                <i class="fas fa-user mr-3"></i>
+                                Informations Personnelles
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        Nom <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           id="lastName" 
+                                           class="form-input w-full" 
+                                           value="Koné"
+                                           disabled
+                                           required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        Prénom <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           id="firstName" 
+                                           class="form-input w-full" 
+                                           value="Marie"
+                                           disabled
+                                           required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        Email <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="email" 
+                                           id="email" 
+                                           class="form-input w-full" 
+                                           value="marie.kone@email.com"
+                                           disabled
+                                           required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        Sexe <span class="text-red-500">*</span>
+                                    </label>
+                                    <select id="gender" 
+                                            class="form-select w-full"
+                                            disabled
+                                            required>
+                                        <option value="">Sélectionner</option>
+                                        <option value="homme">Homme</option>
+                                        <option value="femme" selected>Femme</option>
+                                        <option value="autre">Autre</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Contact -->
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold gradient-text mb-6 flex items-center">
+                                <i class="fas fa-phone mr-3"></i>
+                                Contact
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        Téléphone <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="tel" 
+                                           id="phone" 
+                                           class="form-input w-full" 
+                                           value="+225 01 23 45 67 89"
+                                           disabled
+                                           required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        WhatsApp <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="tel" 
+                                           id="whatsapp" 
+                                           class="form-input w-full" 
+                                           value="+225 01 23 45 67 89"
+                                           disabled
+                                           required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Spécialité -->
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold gradient-text mb-6 flex items-center">
+                                <i class="fas fa-store mr-3"></i>
+                                Type de Commerce
+                            </h3>
+                            <div class="grid grid-cols-1 gap-6">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        Type de Commerce <span class="text-red-500">*</span>
+                                    </label>
+                                    <select id="specialty" 
+                                            class="form-select w-full"
+                                            disabled
+                                            required>
+                                        <option value="">Sélectionner votre type de commerce</option>
+                                        <option value="commercante" selected>Commerçante</option>
+                                        <option value="restauratrice">Restauratrice</option>
+                                        <option value="coiffeuse">Coiffeuse</option>
+                                        <option value="couturiere">Couturière</option>
+                                        <option value="estheticienne">Esthéticienne</option>
+                                        <option value="bijoutiere">Bijoutière</option>
+                                        <option value="artisane">Artisane</option>
+                                        <option value="vendeuse">Vendeuse</option>
+                                        <option value="autre">Autre</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Plan d'abonnement -->
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold gradient-text mb-6 flex items-center">
+                                <i class="fas fa-crown mr-3"></i>
+                                Plan d'abonnement
+                            </h3>
+                            <div class="grid grid-cols-1 gap-6">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        Plan d'abonnement <span class="text-red-500">*</span>
+                                    </label>
+                                    <select id="subscriptionPlan" 
+                                            class="form-select w-full"
+                                            disabled
+                                            required>
+                                        <option value="">Sélectionner votre plan</option>
+                                        <option value="hebdo">Hebdomadaire - 300 FCFA/semaine</option>
+                                        <option value="mensuel" selected>Mensuel - 1.000 FCFA/mois (Populaire)</option>
+                                        <option value="annuel">Annuel - 8.000 FCFA/an (Économisez 4.000 FCFA)</option>
+                                    </select>
+                                </div>
+                                <div class="bg-blue-50 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-blue-800 mb-2">Avantages de votre plan actuel :</h4>
+                                    <ul class="text-sm text-blue-700 space-y-1">
+                                        <li><i class="fas fa-check mr-2"></i>Accès illimité aux articles</li>
+                                        <li><i class="fas fa-check mr-2"></i>Support client prioritaire</li>
+                                        <li><i class="fas fa-check mr-2"></i>Statistiques détaillées</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Sécurité -->
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold gradient-text mb-6 flex items-center">
+                                <i class="fas fa-lock mr-3"></i>
+                                Sécurité
+                            </h3>
+                            <div class="grid grid-cols-1 gap-6">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        Nouveau mot de passe
+                                    </label>
+                                    <input type="password" 
+                                           id="newPassword" 
+                                           class="form-input w-full" 
+                                           placeholder="Laissez vide si vous ne voulez pas changer"
+                                           disabled>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        Confirmer le mot de passe
+                                    </label>
+                                    <input type="password" 
+                                           id="confirmPassword" 
+                                           class="form-input w-full" 
+                                           placeholder="Confirmer le nouveau mot de passe"
+                                           disabled>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Boutons d'action -->
+                        <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 pt-8" id="actionButtons" style="display: none;">
+                            <button type="submit" 
+                                    class="btn-gradient text-white font-bold py-3 px-8 rounded-lg inline-flex items-center justify-center space-x-2">
+                                <i class="fas fa-save"></i>
+                                <span>Enregistrer les modifications</span>
+                            </button>
+                            <button type="button" 
+                                    id="cancelButton"
+                                    class="btn-outline font-bold py-3 px-8 rounded-lg inline-flex items-center justify-center space-x-2">
+                                <i class="fas fa-times"></i>
+                                <span>Annuler</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        // Variables globales
+        let isEditing = false;
+        let originalData = {};
+        
+        // Toggle sidebar pour mobile
+        const toggleSidebar = document.getElementById('toggle-sidebar');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        
+        toggleSidebar.addEventListener('click', function() {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        });
+        
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('open');
+            overlay.classList.add('hidden');
+        });
+        
+        // Éléments du formulaire
+        const editButton = document.getElementById('editButton');
+        const cancelButton = document.getElementById('cancelButton');
+        const actionButtons = document.getElementById('actionButtons');
+        const profileForm = document.getElementById('profileForm');
+        
+        // Tous les champs input et select
+        const formFields = [
+            'lastName', 'firstName', 'email', 'gender', 
+            'phone', 'whatsapp', 'specialty', 'subscriptionPlan',
+            'newPassword', 'confirmPassword'
+        ];
+        
+        // Fonction pour sauvegarder les données originales
+        function saveOriginalData() {
+            originalData = {};
+            formFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                originalData[fieldId] = field.value;
+            });
+        }
+        
+        // Fonction pour restaurer les données originales
+        function restoreOriginalData() {
+            formFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                field.value = originalData[fieldId];
+            });
+        }
+        
+        // Fonction pour activer/désactiver l'édition
+        function toggleEdit() {
+            isEditing = !isEditing;
+            
+            formFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                field.disabled = !isEditing;
+            });
+            
+            if (isEditing) {
+                saveOriginalData();
+                editButton.innerHTML = '<i class="fas fa-eye mr-2"></i>Mode lecture';
+                editButton.classList.add('bg-yellow-500/20');
+                actionButtons.style.display = 'flex';
+            } else {
+                editButton.innerHTML = '<i class="fas fa-edit mr-2"></i>Modifier';
+                editButton.classList.remove('bg-yellow-500/20');
+                actionButtons.style.display = 'none';
+            }
+        }
+        
+        // Fonction pour mettre à jour l'avatar
+        function updateAvatar() {
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const avatarInitials = document.getElementById('avatarInitials');
+            const profileName = document.getElementById('profileName');
+            
+            if (firstName && lastName) {
+                avatarInitials.textContent = firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase();
+                profileName.textContent = `${firstName} ${lastName}`;
+            }
+        }
+        
+        // Fonction pour mettre à jour la spécialité affichée
+        function updateSpecialtyDisplay() {
+            const specialty = document.getElementById('specialty').value;
+            const profileSpecialty = document.getElementById('profileSpecialty');
+            
+            const specialtyNames = {
+                'commercante': 'Commerçante',
+                'restauratrice': 'Restauratrice',
+                'coiffeuse': 'Coiffeuse',
+                'couturiere': 'Couturière',
+                'estheticienne': 'Esthéticienne',
+                'bijoutiere': 'Bijoutière',
+                'artisane': 'Artisane',
+                'vendeuse': 'Vendeuse',
+                'autre': 'Autre activité'
+            };
+            
+            profileSpecialty.textContent = specialtyNames[specialty] || 'Activité non définie';
+        }
+        
+        // Fonction pour mettre à jour le plan affiché
+        function updatePlanDisplay() {
+            const plan = document.getElementById('subscriptionPlan').value;
+            const currentPlan = document.getElementById('currentPlan');
+            
+            const planNames = {
+                'hebdo': 'Plan Hebdomadaire',
+                'mensuel': 'Plan Mensuel',
+                'annuel': 'Plan Annuel'
+            };
+            
+            currentPlan.textContent = planNames[plan] || 'Plan non défini';
+        }
+        
+        // Event listeners
+        editButton.addEventListener('click', toggleEdit);
+        
+        cancelButton.addEventListener('click', function() {
+            restoreOriginalData();
+            toggleEdit();
+        });
+        
+        // Validation et soumission du formulaire
+        profileForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validation des champs requis
+            const requiredFields = ['lastName', 'firstName', 'email', 'gender', 'phone', 'whatsapp', 'specialty', 'subscriptionPlan'];
+            let isValid = true;
+            
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('border-red-500');
+                } else {
+                    field.classList.remove('border-red-500');
+                }
+            });
+            
+            // Validation du mot de passe si fourni
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (newPassword || confirmPassword) {
+                if (newPassword !== confirmPassword) {
+                    isValid = false;
+                    document.getElementById('newPassword').classList.add('border-red-500');
+                    document.getElementById('confirmPassword').classList.add('border-red-500');
+                    alert('Les mots de passe ne correspondent pas');
+                    return;
+                }
+                
+                if (newPassword.length < 6) {
+                    isValid = false;
+                    document.getElementById('newPassword').classList.add('border-red-500');
+                    alert('Le mot de passe doit contenir au moins 6 caractères');
+                    return;
+                }
+            }
+            
+            if (!isValid) {
+                alert('Veuillez remplir tous les champs obligatoires');
+                return;
+            }
+            
+            // Simulation de sauvegarde
+            showSuccessMessage();
+            
+            // Mettre à jour l'affichage
+            updateAvatar();
+            updateSpecialtyDisplay();
+            updatePlanDisplay();
+            
+            // Désactiver l'édition
+            toggleEdit();
+        });
+        
+        // Fonction pour afficher le message de succès
+        function showSuccessMessage() {
+            const successMessage = document.getElementById('successMessage');
+            successMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Event listeners pour la mise à jour en temps réel
+        document.getElementById('firstName').addEventListener('input', updateAvatar);
+        document.getElementById('lastName').addEventListener('input', updateAvatar);
+        document.getElementById('specialty').addEventListener('change', updateSpecialtyDisplay);
+        document.getElementById('subscriptionPlan').addEventListener('change', updatePlanDisplay);
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            updateAvatar();
+            updateSpecialtyDisplay();
+            updatePlanDisplay();
+        });
+    </script>
+</body>
+</html>
