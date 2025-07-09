@@ -37,7 +37,7 @@
         
         .input-field {
             transition: all 0.3s ease;
-            font-size: 16px; /* Évite le zoom sur mobile */
+            font-size: 16px;
         }
         
         .input-field:focus {
@@ -190,6 +190,27 @@
             -webkit-backdrop-filter: blur(4px);
         }
         
+        .role-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #667eea;
+            display: none;
+        }
+        
+        .admin-mode {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        
+        .super-admin-mode {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        }
+        
         /* Responsive Design */
         @media (max-width: 768px) {
             .hero-title {
@@ -205,11 +226,11 @@
             }
             
             .floating-shapes {
-                display: none; /* Cache les formes sur mobile pour les performances */
+                display: none;
             }
             
             .input-field {
-                font-size: 16px; /* Évite le zoom automatique sur iOS */
+                font-size: 16px;
             }
         }
         
@@ -227,7 +248,6 @@
             }
         }
         
-        /* Amélioration de l'accessibilité */
         .input-field:focus-visible {
             outline: 2px solid #667eea;
             outline-offset: 2px;
@@ -239,7 +259,6 @@
             outline-offset: 2px;
         }
         
-        /* Styles pour les navigateurs plus anciens */
         @supports not (backdrop-filter: blur(20px)) {
             .glass-card {
                 background: rgba(255, 255, 255, 0.98);
@@ -275,7 +294,8 @@
             </div>
 
             <!-- Formulaire de connexion -->
-            <div class="glass-card rounded-2xl shadow-xl form-padding p-6 sm:p-8">
+            <div class="glass-card rounded-2xl shadow-xl form-padding p-6 sm:p-8 relative">
+                <div class="role-indicator" id="roleIndicator"></div>
                 <form id="connexionForm" class="space-y-6">
                     <!-- Numéro de téléphone -->
                     <div>
@@ -322,6 +342,7 @@
                         <i class="fas fa-sign-in-alt mr-2"></i>
                         Se connecter
                     </button>
+                </form>
 
                 <!-- Lien d'inscription -->
                 <div class="text-center mt-6 pt-6 border-t border-gray-200">
@@ -386,6 +407,15 @@
     </div>
 
     <script>
+        // Base de données des utilisateurs (en production, ceci serait côté serveur)
+        const users = {
+            // Admin
+            '+22501234567': { password: 'admin123', role: 'admin', name: 'Admin User' },
+            
+            // Super Admin
+            '+22509876543': { password: 'superadmin123', role: 'superadmin', name: 'Super Admin' }
+        };
+
         function togglePassword() {
             const input = document.getElementById('motDePasse');
             const eye = document.getElementById('eyeIcon');
@@ -422,30 +452,69 @@
             return regex.test(phone);
         }
         
+        function normalizePhone(phone) {
+            // Nettoyer le numéro
+            let cleaned = phone.replace(/[\s\-\(\)]/g, '');
+            
+            // Ajouter le préfixe +225 si nécessaire
+            if (cleaned.startsWith('0')) {
+                cleaned = '225' + cleaned.substring(1);
+            }
+            if (!cleaned.startsWith('+') && !cleaned.startsWith('225')) {
+                cleaned = '225' + cleaned;
+            }
+            if (cleaned.startsWith('225') && !cleaned.startsWith('+225')) {
+                cleaned = '+' + cleaned;
+            }
+            
+            return cleaned;
+        }
+        
+        function authenticateUser(phone, password) {
+            const normalizedPhone = normalizePhone(phone);
+            const phoneVariants = [
+                normalizedPhone,
+                normalizedPhone.replace('+', ''),
+                phone.replace(/[\s\-\(\)]/g, '')
+            ];
+            
+            for (let variant of phoneVariants) {
+                if (users[variant] && users[variant].password === password) {
+                    return users[variant];
+                }
+            }
+            
+            return null;
+        }
+        
+        function redirectUser(role) {
+            const roleIndicator = document.getElementById('roleIndicator');
+            
+            if (role === 'admin') {
+                roleIndicator.textContent = 'ADMIN';
+                roleIndicator.classList.add('admin-mode');
+                roleIndicator.style.display = 'block';
+                
+                setTimeout(() => {
+                    window.location.href = '../dashUser/dashUser.html';
+                }, 1500);
+            } else if (role === 'superadmin') {
+                roleIndicator.textContent = 'SUPER ADMIN';
+                roleIndicator.classList.add('super-admin-mode');
+                roleIndicator.style.display = 'block';
+                
+                setTimeout(() => {
+                    window.location.href = '../dashAdmin/dashAdmin.html';
+                }, 1500);
+            }
+        }
+        
         function showForgotPassword() {
             document.getElementById('forgotPasswordModal').classList.remove('hidden');
         }
         
         function closeForgotPassword() {
             document.getElementById('forgotPasswordModal').classList.add('hidden');
-        }
-        
-        function connectWithWhatsApp() {
-            const phone = document.getElementById('telephone').value;
-            if (!phone) {
-                showError('telephone', 'Veuillez d\'abord saisir votre numéro de téléphone');
-                return;
-            }
-            
-            if (!validatePhone(phone)) {
-                showError('telephone', 'Numéro de téléphone invalide');
-                return;
-            }
-            
-            // Simuler la connexion WhatsApp
-            alert('Redirection vers WhatsApp pour la vérification...');
-            // Ici vous pourriez rediriger vers WhatsApp avec un lien personnalisé
-            // window.open(`https://wa.me/${phone.replace(/\D/g, '')}?text=Code de vérification MEFEM`, '_blank');
         }
         
         // Validation en temps réel
@@ -491,68 +560,60 @@
                 const button = document.querySelector('button[type="submit"]');
                 const originalContent = button.innerHTML;
                 
-                button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Connexion en cours...';
+                button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Vérification en cours...';
                 button.disabled = true;
                 
-                // Simuler l'authentification avec vérification du rôle
+                // Simuler l'authentification
                 setTimeout(() => {
-                    // Simuler une vérification d'authentification
-                    // Ici vous pourriez faire un appel API pour vérifier les credentials
+                    const user = authenticateUser(telephone, motDePasse);
                     
-                    // Déterminer le type d'utilisateur basé sur le numéro de téléphone ou d'autres critères
-                    // Pour cet exemple, on utilise une logique simple basée sur le numéro de téléphone
-                    const isAdmin = determineUserRole(telephone, motDePasse);
-                    
-                    // Simuler une authentification réussie
-                    button.innerHTML = '<i class="fas fa-check mr-2"></i>Connexion réussie !';
-                    button.classList.remove('btn-primary');
-                    button.classList.add('bg-green-500');
-                    
-                    setTimeout(() => {
-                        // Rediriger vers le bon tableau de bord selon le rôle
-                        if (isAdmin) {
-                            alert('Connexion réussie ! Redirection vers le tableau de bord administrateur...');
-                            window.location.href = '../dashAdmin/dashAdmin.html';
-                        } else {
-                            alert('Connexion réussie ! Redirection vers votre tableau de bord utilisateur...');
-                            window.location.href = '../dashUser/dashUser.html';
+                    if (user) {
+                        // Connexion réussie
+                        button.innerHTML = '<i class="fas fa-check mr-2"></i>Connexion réussie !';
+                        button.classList.remove('btn-primary');
+                        button.classList.add('bg-green-500');
+                        
+                        // Sauvegarder les informations utilisateur (optionnel)
+                        if (document.getElementById('seSouvenir').checked) {
+                            localStorage.setItem('rememberedUser', JSON.stringify({
+                                phone: telephone,
+                                role: user.role,
+                                name: user.name
+                            }));
                         }
-                    }, 1000);
-                }, 2000);
+                        
+                        // Rediriger selon le rôle
+                        redirectUser(user.role);
+                        
+                    } else {
+                        // Échec de l'authentification
+                        button.innerHTML = '<i class="fas fa-times mr-2"></i>Identifiants incorrects';
+                        button.classList.remove('btn-primary');
+                        button.classList.add('bg-red-500');
+                        
+                        showError('telephone', 'Numéro de téléphone ou mot de passe incorrect');
+                        showError('motDePasse', 'Numéro de téléphone ou mot de passe incorrect');
+                        
+                        // Ajouter un effet de secousse
+                        document.querySelector('.glass-card').classList.add('shake');
+                        
+                        setTimeout(() => {
+                            button.innerHTML = originalContent;
+                            button.disabled = false;
+                            button.classList.remove('bg-red-500');
+                            button.classList.add('btn-primary');
+                            document.querySelector('.glass-card').classList.remove('shake');
+                        }, 2000);
+                    }
+                }, 1500);
             } else {
-                // Ajouter un effet de secousse en cas d'erreur
+                // Ajouter un effet de secousse en cas d'erreur de validation
                 document.querySelector('.glass-card').classList.add('shake');
                 setTimeout(() => {
                     document.querySelector('.glass-card').classList.remove('shake');
                 }, 500);
             }
         });
-        
-        // Fonction pour déterminer le rôle de l'utilisateur
-        function determineUserRole(telephone, motDePasse) {
-            // Logique pour déterminer si l'utilisateur est admin ou utilisateur normal
-            // Vous pouvez adapter cette logique selon vos besoins
-            
-            // Exemple 1: Basé sur le numéro de téléphone (si vous avez des numéros admin spécifiques)
-            const adminPhones = ['+22507000000', '+22508000000', '07000000', '08000000'];
-            if (adminPhones.includes(telephone.replace(/\s/g, ''))) {
-                return true; // Admin
-            }
-            
-            // Exemple 2: Basé sur un mot de passe spécial
-            const adminPasswords = ['admin123', 'admin2024', 'superadmin'];
-            if (adminPasswords.includes(motDePasse)) {
-                return true; // Admin
-            }
-            
-            // Exemple 3: Basé sur une combinaison téléphone + mot de passe
-            if (telephone.includes('07000000') && motDePasse === 'admin123') {
-                return true; // Admin
-            }
-            
-            // Par défaut, considérer comme utilisateur normal
-            return false; // Utilisateur normal
-        }
         
         // Validation du formulaire mot de passe oublié
         document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
@@ -570,7 +631,15 @@
             button.disabled = true;
             
             setTimeout(() => {
-                alert('Code de réinitialisation envoyé par SMS !');
+                const normalizedPhone = normalizePhone(phone);
+                const userExists = users[normalizedPhone] || users[normalizedPhone.replace('+', '')] || users[phone.replace(/[\s\-\(\)]/g, '')];
+                
+                if (userExists) {
+                    alert('Code de réinitialisation envoyé par SMS !');
+                } else {
+                    alert('Aucun compte trouvé avec ce numéro de téléphone.');
+                }
+                
                 closeForgotPassword();
                 button.innerHTML = 'Envoyer le code';
                 button.disabled = false;
@@ -581,6 +650,16 @@
         document.getElementById('forgotPasswordModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeForgotPassword();
+            }
+        });
+        
+        // Charger les informations sauvegardées au chargement de la page
+        window.addEventListener('load', function() {
+            const rememberedUser = localStorage.getItem('rememberedUser');
+            if (rememberedUser) {
+                const userData = JSON.parse(rememberedUser);
+                document.getElementById('telephone').value = userData.phone;
+                document.getElementById('seSouvenir').checked = true;
             }
         });
     </script>

@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord - MEFEM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .sidebar {
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+        }
+        
+        .sidebar-item {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sidebar-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .sidebar-item:hover::before {
+            left: 100%;
+        }
+        
+        .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .sidebar-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid white;
+        }
+        
+        .main-content {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        
+        .stats-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .notification-item {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .notification-item:hover {
+            background: rgba(102, 126, 234, 0.05);
+            border-left-color: #667eea;
+        }
+        
+        .notification-item.unread {
+            background: rgba(102, 126, 234, 0.1);
+            border-left-color: #667eea;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        .activity-item {
+            transition: all 0.3s ease;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .activity-item:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            color: white;
+        }
+        
+        .activity-new {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .activity-update {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        
+        .activity-delete {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        
+        .activity-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .quick-action-btn {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .quick-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        
+        .modal {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+        
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 50;
+                height: 100vh;
+                width: 280px;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+            }
+            
+            .stats-card {
+                margin-bottom: 1rem;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+            
+            .quick-action-btn {
+                padding: 0.75rem;
+            }
+            
+            .quick-action-btn i {
+                font-size: 1.5rem !important;
+            }
+            
+            .quick-action-btn p {
+                font-size: 0.75rem;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .stats-card {
+                padding: 1rem;
+            }
+            
+            .stats-card .text-3xl {
+                font-size: 1.5rem;
+            }
+            
+            .chart-container {
+                height: 200px;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .quick-action-btn {
+                padding: 0.5rem;
+            }
+            
+            .quick-action-btn i {
+                font-size: 1.25rem !important;
+            }
+            
+            .quick-action-btn p {
+                font-size: 0.7rem;
+            }
+            
+            .activity-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 0.75rem;
+            }
+            
+            .notification-item {
+                padding: 0.75rem;
+            }
+            
+            .modal-content {
+                margin: 1rem;
+                max-width: calc(100vw - 2rem);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 100vw;
+            }
+            
+            .stats-card {
+                padding: 0.75rem;
+            }
+            
+            .stats-card .text-3xl {
+                font-size: 1.25rem;
+            }
+            
+            .chart-container {
+                height: 180px;
+            }
+            
+            .quick-action-btn {
+                padding: 0.5rem;
+                border-radius: 8px;
+            }
+            
+            .quick-action-btn i {
+                font-size: 1rem !important;
+                margin-bottom: 0.25rem;
+            }
+            
+            .quick-action-btn p {
+                font-size: 0.65rem;
+            }
+            
+            .activity-item {
+                padding: 0.5rem;
+            }
+            
+            .activity-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 0.7rem;
+            }
+            
+            .notification-item {
+                padding: 0.5rem;
+            }
+            
+            .notification-item i {
+                font-size: 0.875rem;
+            }
+            
+            .notification-item p {
+                font-size: 0.75rem;
+            }
+            
+            .notification-item .text-xs {
+                font-size: 0.65rem;
+            }
+            
+            .modal-content {
+                margin: 0.5rem;
+                padding: 1rem;
+                max-width: calc(100vw - 1rem);
+            }
+            
+            .table-auto th,
+            .table-auto td {
+                padding: 0.5rem 0.25rem;
+                font-size: 0.75rem;
+            }
+            
+            .table-auto th {
+                font-size: 0.7rem;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .stats-card {
+                padding: 0.5rem;
+            }
+            
+            .stats-card .text-3xl {
+                font-size: 1.125rem;
+            }
+            
+            .chart-container {
+                height: 160px;
+            }
+            
+            .quick-action-btn {
+                padding: 0.375rem;
+            }
+            
+            .quick-action-btn i {
+                font-size: 0.875rem !important;
+                margin-bottom: 0.125rem;
+            }
+            
+            .quick-action-btn p {
+                font-size: 0.6rem;
+            }
+            
+            .activity-item {
+                padding: 0.375rem;
+            }
+            
+            .activity-icon {
+                width: 24px;
+                height: 24px;
+                font-size: 0.625rem;
+            }
+            
+            .notification-item {
+                padding: 0.375rem;
+            }
+            
+            .notification-item i {
+                font-size: 0.75rem;
+            }
+            
+            .notification-item p {
+                font-size: 0.7rem;
+            }
+            
+            .notification-item .text-xs {
+                font-size: 0.6rem;
+            }
+            
+            .modal-content {
+                margin: 0.25rem;
+                padding: 0.75rem;
+                max-width: calc(100vw - 0.5rem);
+            }
+            
+            .table-auto th,
+            .table-auto td {
+                padding: 0.375rem 0.125rem;
+                font-size: 0.7rem;
+            }
+            
+            .table-auto th {
+                font-size: 0.65rem;
+            }
+        }
+        
+        /* Tablet specific styles */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .sidebar {
+                width: 240px;
+            }
+            
+            .main-content {
+                margin-left: 240px;
+            }
+            
+            .stats-card {
+                padding: 1.25rem;
+            }
+            
+            .chart-container {
+                height: 280px;
+            }
+            
+            .quick-action-btn {
+                padding: 0.875rem;
+            }
+            
+            .quick-action-btn i {
+                font-size: 1.75rem !important;
+            }
+            
+            .quick-action-btn p {
+                font-size: 0.8rem;
+            }
+        }
+        
+        /* Large screen optimizations */
+        @media (min-width: 1025px) {
+            .stats-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+            }
+            
+            .quick-action-btn:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            }
+        }
+        
+        /* Landscape orientation adjustments */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .sidebar {
+                overflow-y: auto;
+            }
+            
+            .chart-container {
+                height: 150px;
+            }
+            
+            .stats-card {
+                padding: 0.75rem;
+            }
+            
+            .stats-card .text-3xl {
+                font-size: 1.25rem;
+            }
+            
+            .activity-item,
+            .notification-item {
+                padding: 0.5rem;
+            }
+            
+            .activity-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 0.7rem;
+            }
+        }
+        
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .stats-card {
+                border-width: 0.5px;
+            }
+            
+            .sidebar-item {
+                border-left-width: 2px;
+            }
+        }
+        
+        /* Print styles */
+        @media print {
+            .sidebar,
+            .header,
+            .quick-action-btn,
+            #notificationBtn,
+            #toggle-sidebar {
+                display: none !important;
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+                background: white !important;
+            }
+            
+            .stats-card {
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+                break-inside: avoid;
+            }
+            
+            .chart-container {
+                height: 200px !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Overlay pour mobile -->
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden"></div>
+    
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar fixed left-0 top-0 w-64 h-full shadow-2xl z-50">
+        <div class="p-6 border-b border-white/20">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                    <i class="fas fa-gem text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-white text-2xl font-bold">MEFEM</h1>
+                    <p class="text-white/80 text-sm">Super Admin</p>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="mt-6">
+            <ul class="space-y-2 px-4">
+                <li>
+                    <a href="#" class="sidebar-item active flex items-center px-4 py-3 text-white rounded-lg block">
+                        <i class="fas fa-tachometer-alt w-6 text-center mr-3"></i>
+                        <span>Tableau de Bord</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="adminUser.html" class="sidebar-item flex items-center px-4 py-3 text-white rounded-lg block">
+                        <i class="fas fa-users w-6 text-center mr-3"></i>
+                        <span>Utilisateurs</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="adminHistorique.html" class="sidebar-item flex items-center px-4 py-3 text-white rounded-lg block">
+                        <i class="fas fa-history w-6 text-center mr-3"></i>
+                        <span>Historique</span>
+                    </a>
+                </li>
+                <li class="pt-4 border-t border-white/20">
+                    <a href="adminProfile.html" class="sidebar-item flex items-center px-4 py-3 text-white rounded-lg block hover:bg-blue-500/20">
+                        <i class="fas fa-user-cog w-6 text-center mr-3"></i>
+                        <span>Profil Admin</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../auth/login.html" onclick="logout()" class="sidebar-item flex items-center px-4 py-3 text-white rounded-lg block hover:bg-red-500/20">
+                        <i class="fas fa-sign-out-alt w-6 text-center mr-3"></i>
+                        <span>Déconnexion</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content ml-64 transition-all duration-300">
+        <!-- Header -->
+        <header class="bg-white/90 backdrop-blur-xl shadow-lg sticky top-0 z-30">
+            <div class="flex items-center justify-between px-6 py-4">
+                <div class="flex items-center space-x-4">
+                    <button id="toggle-sidebar" class="md:hidden text-gray-600 hover:text-gray-800">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <div>
+                        <h1 class="text-2xl font-bold gradient-text">Tableau de Bord</h1>
+                        <p class="text-gray-600 text-sm">Vue d'ensemble de la plateforme MEFEM</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <button id="notificationBtn" class="p-2 text-gray-600 hover:text-gray-800 relative">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span id="notificationBadge" class="notification-badge">5</span>
+                        </button>
+                    </div>
+                    <div class="w-10 h-10 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user-shield text-white"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Dashboard Content -->
+        <div class="p-6">
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="stats-card p-6 fade-in">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Nouvelles Inscriptions</p>
+                            <p class="text-3xl font-bold text-green-600" id="newUsers">12</p>
+                            <p class="text-xs text-gray-500">Cette semaine</p>
+                        </div>
+                        <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user-plus text-white"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-card p-6 fade-in">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Utilisateurs Actifs</p>
+                            <p class="text-3xl font-bold text-blue-600" id="activeUsers">156</p>
+                            <p class="text-xs text-gray-500">Ce mois</p>
+                        </div>
+                        <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-users text-white"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-card p-6 fade-in">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Articles Publiés</p>
+                            <p class="text-3xl font-bold text-orange-600" id="totalArticles">1,234</p>
+                            <p class="text-xs text-gray-500">+18 aujourd'hui</p>
+                        </div>
+                        <div class="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-newspaper text-white"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-card p-6 fade-in">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Revenus Total</p>
+                            <p class="text-3xl font-bold text-purple-600" id="totalRevenue">2.5M</p>
+                            <p class="text-xs text-gray-500">FCFA</p>
+                        </div>
+                        <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-coins text-white"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Charts and Notifications Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- Chart -->
+                <div class="stats-card p-6 fade-in">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Inscriptions par Mois</h3>
+                        <div class="flex items-center space-x-2">
+                            <button class="text-sm text-blue-600 hover:text-blue-800">Cette année</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="signupsChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Notifications Panel -->
+                <div class="stats-card p-6 fade-in">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Notifications Récentes</h3>
+                        <button id="markAllRead" class="text-sm text-blue-600 hover:text-blue-800">
+                            Marquer tout comme lu
+                        </button>
+                    </div>
+                    <div class="space-y-2 max-h-80 overflow-y-auto" id="notificationsList">
+                        <!-- Notifications will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Activity and Quick Actions Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- Recent Activity -->
+                <div class="stats-card p-6 fade-in">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Activité Récente</h3>
+                    <div class="space-y-3 max-h-80 overflow-y-auto" id="activityList">
+                        <!-- Activity will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="stats-card p-6 fade-in">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Actions Rapides</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="quick-action-btn" onclick="showUserModal()">
+                            <i class="fas fa-user-plus text-2xl text-blue-600 mb-2"></i>
+                            <p class="text-sm font-medium text-gray-700">Ajouter Utilisateur</p>
+                        </div>
+                        <div class="quick-action-btn" onclick="exportData()">
+                            <i class="fas fa-download text-2xl text-green-600 mb-2"></i>
+                            <p class="text-sm font-medium text-gray-700">Exporter Données</p>
+                        </div>
+                        <div class="quick-action-btn" onclick="sendNotification()">
+                            <i class="fas fa-bell text-2xl text-yellow-600 mb-2"></i>
+                            <p class="text-sm font-medium text-gray-700">Envoyer Notification</p>
+                        </div>
+                        <div class="quick-action-btn" onclick="viewReports()">
+                            <i class="fas fa-chart-bar text-2xl text-purple-600 mb-2"></i>
+                            <p class="text-sm font-medium text-gray-700">Voir Rapports</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Users Table -->
+            <div class="stats-card p-6 fade-in">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">Utilisateurs Récents</h3>
+                    <a href="adminUser.html" class="text-blue-600 hover:text-blue-800 text-sm">Voir tout →</a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full table-auto">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Utilisateur</th>
+                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Spécialité</th>
+                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Plan</th>
+                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Inscription</th>
+                                <th class="text-left py-3 px-4 font-semibold text-gray-700">Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentUsersTable">
+                            <!-- Recent users will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notifications Modal -->
+    <div id="notificationsModal" class="modal fixed inset-0 flex items-center justify-center z-50 hidden">
+        <div class="modal-content max-w-md mx-4 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-900">Notifications</h3>
+                <button id="closeNotifications" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-2 max-h-80 overflow-y-auto" id="modalNotificationsList">
+                <!-- Notifications will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Sample data
+        const notifications = [
+            {
+                id: 1,
+                type: 'new_user',
+                title: 'Nouvelle inscription',
+                message: 'Marie Koné vient de s\'inscrire avec le plan mensuel',
+                time: '2024-07-09 10:30:00',
+                read: false,
+                icon: 'fas fa-user-plus',
+                color: 'text-green-600'
+            },
+            {
+                id: 2,
+                type: 'article',
+                title: 'Nouvel article',
+                message: 'Aminata Diallo a publié un nouvel article',
+                time: '2024-07-09 08:45:00',
+                read: true,
+                icon: 'fas fa-newspaper',
+                color: 'text-orange-600'
+            },
+            {
+                id: 3,
+                type: 'new_user',
+                title: 'Nouvelle inscription',
+                message: 'Aissatou Coulibaly a rejoint la plateforme',
+                time: '2024-07-08 14:10:00',
+                read: true,
+                icon: 'fas fa-user-plus',
+                color: 'text-green-600'
+            }
+        ];
+        
+        const activities = [
+            {
+                id: 1,
+                type: 'new',
+                user: 'Marie Koné',
+                action: 'Nouvelle inscription',
+                time: '2024-07-09 10:30:00',
+                icon: 'activity-new'
+            },
+            {
+                id: 2,
+                type: 'update',
+                user: 'Fatou Traoré',
+                action: 'Mise à jour du profil',
+                time: '2024-07-09 09:15:00',
+                icon: 'activity-update'
+            },
+            {
+                id: 3,
+                type: 'login',
+                user: 'Aminata Diallo',
+                action: 'Connexion',
+                time: '2024-07-09 08:45:00',
+                icon: 'activity-login'
+            },
+            {
+                id: 4,
+                type: 'delete',
+                user: 'Admin',
+                action: 'Suppression d\'un article',
+                time: '2024-07-08 16:20:00',
+                icon: 'activity-delete'
+            }
+        ];
+        
+        const recentUsers = [
+            {
+                name: 'Marie Koné',
+                specialty: 'Commerçante',
+                plan: 'Mensuel',
+                joinDate: '2024-07-09',
+                status: 'active'
+            },
+            {
+                name: 'Fatou Traoré',
+                specialty: 'Coiffeuse',
+                plan: 'Hebdomadaire',
+                joinDate: '2024-07-08',
+                status: 'active'
+            },
+            {
+                name: 'Aminata Diallo',
+                specialty: 'Couturière',
+                plan: 'Annuel',
+                joinDate: '2024-07-07',
+                status: 'inactive'
+            }
+        ];
+        
+        // Initialize dashboard
+        function initDashboard() {
+            renderNotifications();
+            renderActivities();
+            renderRecentUsers();
+            createChart();
+            updateNotificationBadge();
+        }
+        
+        // Render notifications
+        function renderNotifications() {
+            const notificationsList = document.getElementById('notificationsList');
+            const modalNotificationsList = document.getElementById('modalNotificationsList');
+            
+            const notificationsHTML = notifications.slice(0, 5).map(notification => `
+                <div class="notification-item ${notification.read ? '' : 'unread'} p-3 rounded-lg cursor-pointer" 
+                     onclick="markAsRead(${notification.id})">
+                    <div class="flex items-start space-x-3">
+                        <div class="flex-shrink-0">
+                            <i class="${notification.icon} ${notification.color}"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900">${notification.title}</p>
+                            <p class="text-xs text-gray-500 mt-1">${notification.message}</p>
+                            <p class="text-xs text-gray-400 mt-1">${formatTime(notification.time)}</p>
+                        </div>
+                        ${!notification.read ? '<div class="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0"></div>' : ''}
+                    </div>
+                </div>
+            `).join('');
+            
+            notificationsList.innerHTML = notificationsHTML;
+            modalNotificationsList.innerHTML = notificationsHTML;
+        }
+        
+        // Render activities
+        function renderActivities() {
+            const activityList = document.getElementById('activityList');
+            
+            const activitiesHTML = activities.map(activity => `
+                <div class="activity-item">
+                    <div class="flex items-center space-x-3">
+                        <div class="activity-icon ${activity.icon}">
+                            <i class="${getActivityIcon(activity.type)}"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-gray-900">${activity.user}</p>
+                            <p class="text-xs text-gray-500">${activity.action}</p>
+                            <p class="text-xs text-gray-400">${formatTime(activity.time)}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            activityList.innerHTML = activitiesHTML;
+        }
+        
+        // Render recent users
+        function renderRecentUsers() {
+            const recentUsersTable = document.getElementById('recentUsersTable');
+            
+            const usersHTML = recentUsers.map(user => `
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-3 px-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                                ${user.name.charAt(0)}
+                            </div>
+                            <span class="font-medium text-gray-900">${user.name}</span>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4 text-sm text-gray-600">${user.specialty}</td>
+                    <td class="py-3 px-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            ${user.plan}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-sm text-gray-600">${formatDate(user.joinDate)}</td>
+                    <td class="py-3 px-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${user.status === 'active' ? 'Actif' : 'Inactif'}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+            
+            recentUsersTable.innerHTML = usersHTML;
+        }
+        
+        // Create chart
+        function createChart() {
+            const ctx = document.getElementById('signupsChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'],
+                    datasets: [{
+                        label: 'Inscriptions',
+                        data: [65, 78, 90, 85, 120, 150, 180, 200, 175, 160, 140, 180],
+                        borderColor: 'rgb(102, 126, 234)',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Update notification badge
+        function updateNotificationBadge() {
+            const unreadCount = notifications.filter(n => !n.read).length;
+            const badge = document.getElementById('notificationBadge');
+            badge.textContent = unreadCount;
+            badge.style.display = unreadCount > 0 ? 'flex' : 'none';
+        }
+        
+        // Format time
+        function formatTime(timeString) {
+            const date = new Date(timeString);
+            const now = new Date();
+            const diffInHours = (now - date) / (1000 * 60 * 60);
+            
+            if (diffInHours < 1) {
+                const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+                return `Il y a ${diffInMinutes} min`;
+            } else if (diffInHours < 24) {
+                return `Il y a ${Math.floor(diffInHours)}h`;
+            } else {
+                return date.toLocaleDateString('fr-FR');
+            }
+        }
+        
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fr-FR');
+        }
+        
+        // Get activity icon
+        function getActivityIcon(type) {
+            const icons = {
+                'new': 'fas fa-plus',
+                'update': 'fas fa-edit',
+                'delete': 'fas fa-trash',
+                'login': 'fas fa-sign-in-alt'
+            };
+            return icons[type] || 'fas fa-circle';
+        }
+        
+        // Mark notification as read
+        function markAsRead(notificationId) {
+            const notification = notifications.find(n => n.id === notificationId);
+            if (notification) {
+                notification.read = true;
+                renderNotifications();
+                updateNotificationBadge();
+            }
+        }
+        
+        // Mark all notifications as read
+        function markAllAsRead() {
+            notifications.forEach(n => n.read = true);
+            renderNotifications();
+            updateNotificationBadge();
+        }
+        
+        // Show notifications modal
+        function showNotificationsModal() {
+            const modal = document.getElementById('notificationsModal');
+            modal.classList.remove('hidden');
+        }
+        
+        // Close notifications modal
+        function closeNotificationsModal() {
+            const modal = document.getElementById('notificationsModal');
+            modal.classList.add('hidden');
+        }
+        
+        // Toggle sidebar on mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        }
+        
+        // Quick action functions
+        function showUserModal() {
+            alert('Fonctionnalité d\'ajout d\'utilisateur à implémenter');
+        }
+        
+        function exportData() {
+            alert('Fonctionnalité d\'export de données à implémenter');
+        }
+        
+        function sendNotification() {
+            alert('Fonctionnalité d\'envoi de notification à implémenter');
+        }
+        
+        function viewReports() {
+            alert('Fonctionnalité de rapports à implémenter');
+        }
+        
+        // Logout function
+        function logout() {
+            if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+                // Clear any stored session data
+                localStorage.removeItem('adminToken');
+                sessionStorage.clear();
+                // Redirect to login page
+                window.location.href = '../auth/login.html';
+            }
+        }
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            initDashboard();
+            
+            // Notification button
+            document.getElementById('notificationBtn').addEventListener('click', showNotificationsModal);
+            
+            // Close notifications modal
+            document.getElementById('closeNotifications').addEventListener('click', closeNotificationsModal);
+            
+            // Mark all as read
+            document.getElementById('markAllRead').addEventListener('click', markAllAsRead);
+            
+            // Toggle sidebar
+            document.getElementById('toggle-sidebar').addEventListener('click', toggleSidebar);
+            
+            // Close sidebar when clicking overlay
+            document.getElementById('overlay').addEventListener('click', toggleSidebar);
+            
+            // Close modal when clicking outside
+            document.getElementById('notificationsModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeNotificationsModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

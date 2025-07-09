@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Admin - MEFEM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .sidebar {
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+        }
+        
+        .sidebar-item {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sidebar-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .sidebar-item:hover::before {
+            left: 100%;
+        }
+        
+        .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .sidebar-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid white;
+        }
+        
+        .main-content {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        
+        .profile-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .profile-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .form-input:disabled {
+            background: rgba(243, 244, 246, 0.7);
+            cursor: not-allowed;
+        }
+        
+        .btn-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-gradient:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(107, 114, 128, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-danger:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+        
+        .modal {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+        
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+        
+        .avatar-container {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .avatar {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        .avatar-edit {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .avatar-edit:hover {
+            background: #764ba2;
+            transform: scale(1.1);
+        }
+        
+        .password-input-container {
+            position: relative;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 4px;
+        }
+        
+        .password-toggle:hover {
+            color: #667eea;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: all 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 50;
+                height: 100vh;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+    
+    <!-- Overlay pour mobile -->
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden"></div>
+    
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar fixed left-0 top-0 w-64 h-full shadow-2xl z-50">
+        <div class="p-6 border-b border-white/20">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                    <i class="fas fa-gem text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-white text-2xl font-bold">MEFEM</h1>
+                    <p class="text-white/80 text-sm">Super Admin</p>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="mt-6">
+            <ul class="space-y-2 px-4">
+                <li>
+                    <a href="dashAdmin.html" class="sidebar-item flex items-center px-4 py-3 text-white rounded-lg block">
+                        <i class="fas fa-tachometer-alt w-6 text-center mr-3"></i>
+                        <span>Tableau de Bord</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="adminUser.html" class="sidebar-item flex items-center px-4 py-3 text-white rounded-lg block">
+                        <i class="fas fa-users w-6 text-center mr-3"></i>
+                        <span>Utilisateurs</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="adminHistorique.html" class="sidebar-item flex items-center px-4 py-3 text-white rounded-lg block">
+                        <i class="fas fa-history w-6 text-center mr-3"></i>
+                        <span>Historique</span>
+                    </a>
+                </li>
+                <li class="pt-4 border-t border-white/20">
+                    <a href="adminProfile.html" class="sidebar-item active flex items-center px-4 py-3 text-white rounded-lg block">
+                        <i class="fas fa-user-cog w-6 text-center mr-3"></i>
+                        <span>Profil Admin</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../auth/login.html" class="sidebar-item flex items-center px-4 py-3 text-white rounded-lg block hover:bg-red-500/20">
+                        <i class="fas fa-sign-out-alt w-6 text-center mr-3"></i>
+                        <span>Déconnexion</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content ml-64 transition-all duration-300">
+        <!-- Header -->
+        <header class="bg-white/90 backdrop-blur-xl shadow-lg sticky top-0 z-30">
+            <div class="flex items-center justify-between px-6 py-4">
+                <div class="flex items-center space-x-4">
+                    <button id="toggle-sidebar" class="md:hidden text-gray-600 hover:text-gray-800">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <div>
+                        <h1 class="text-2xl font-bold gradient-text">Profil Administrateur</h1>
+                        <p class="text-gray-600 text-sm">Gérez vos informations personnelles</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <button class="p-2 text-gray-600 hover:text-gray-800 relative">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span class="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"></span>
+                        </button>
+                    </div>
+                    <div class="w-10 h-10 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user-shield text-white"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Profile Content -->
+        <section class="py-8 px-6">
+            <div class="max-w-4xl mx-auto">
+                <!-- Profile Header -->
+                <div class="profile-card p-8 mb-8 fade-in">
+                    <div class="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
+                        <div class="avatar-container">
+                            <div class="avatar" id="userAvatar">
+                                AD
+                            </div>
+                            <button class="avatar-edit" onclick="showAvatarModal()">
+                                <i class="fas fa-camera text-sm"></i>
+                            </button>
+                        </div>
+                        <div class="flex-1 text-center md:text-left">
+                            <h2 class="text-3xl font-bold gradient-text mb-2" id="displayName">Admin MEFEM</h2>
+                            <p class="text-gray-600 text-lg mb-4" id="displayEmail">admin@mefem.com</p>
+                            <div class="flex flex-wrap gap-4 justify-center md:justify-start">
+                                <div class="flex items-center space-x-2 text-gray-600">
+                                    <i class="fas fa-phone"></i>
+                                    <span id="displayPhone">+225 01 23 45 67 89</span>
+                                </div>
+                                <div class="flex items-center space-x-2 text-gray-600">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>Membre depuis janvier 2024</span>
+                                </div>
+                                <div class="flex items-center space-x-2 text-gray-600">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span>Super Administrateur</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Profile Form -->
+                <div class="profile-card p-8 fade-in">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-2xl font-bold gradient-text">Informations Personnelles</h3>
+                        <button id="editBtn" class="btn-gradient px-6 py-3 text-white rounded-lg flex items-center space-x-2">
+                            <i class="fas fa-edit"></i>
+                            <span>Modifier</span>
+                        </button>
+                    </div>
+                    
+                    <form id="profileForm">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="form-group">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-user mr-2"></i>Prénom
+                                </label>
+                                <input type="text" id="firstName" class="form-input" value="Admin" disabled>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-user mr-2"></i>Nom
+                                </label>
+                                <input type="text" id="lastName" class="form-input" value="MEFEM" disabled>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-envelope mr-2"></i>Email
+                                </label>
+                                <input type="email" id="email" class="form-input" value="admin@mefem.com" disabled>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-phone mr-2"></i>Téléphone
+                                </label>
+                                <input type="tel" id="phone" class="form-input" value="+225 01 23 45 67 89" disabled>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 pt-6 border-t border-gray-200">
+                            <h4 class="text-xl font-bold text-gray-900 mb-4">Sécurité</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="form-group">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <i class="fas fa-lock mr-2"></i>Mot de passe actuel
+                                    </label>
+                                    <div class="password-input-container">
+                                        <input type="password" id="currentPassword" class="form-input" placeholder="••••••••" disabled>
+                                        <button type="button" class="password-toggle" onclick="togglePassword('currentPassword')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <i class="fas fa-key mr-2"></i>Nouveau mot de passe
+                                    </label>
+                                    <div class="password-input-container">
+                                        <input type="password" id="newPassword" class="form-input" placeholder="••••••••" disabled>
+                                        <button type="button" class="password-toggle" onclick="togglePassword('newPassword')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end space-x-4 mt-8" id="formActions" style="display: none;">
+                            <button type="button" id="cancelBtn" class="btn-secondary px-6 py-3 text-white rounded-lg">
+                                Annuler
+                            </button>
+                            <button type="submit" class="btn-gradient px-6 py-3 text-white rounded-lg">
+                                Sauvegarder
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Security Settings -->
+                <div class="profile-card p-8 mt-8 fade-in">
+                    <h3 class="text-2xl font-bold gradient-text mb-6">Paramètres de Sécurité</h3>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-history text-green-600"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900">Historique des connexions</h4>
+                                    <p class="text-sm text-gray-600">Consultez vos dernières connexions</p>
+                                </div>
+                            </div>
+                            <button class="btn-secondary px-4 py-2 text-white rounded-lg text-sm">
+                                Voir
+                            </button>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-4 bg-red-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-exclamation-triangle text-red-600"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900">Réinitialiser le mot de passe</h4>
+                                    <p class="text-sm text-gray-600">Forcer la réinitialisation au prochain login</p>
+                                </div>
+                            </div>
+                            <button class="btn-danger px-4 py-2 text-white rounded-lg text-sm">
+                                Réinitialiser
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Avatar Modal -->
+    <div id="avatarModal" class="modal fixed inset-0 flex items-center justify-center z-50 hidden">
+        <div class="modal-content max-w-md mx-4 p-6">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-camera text-blue-500 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Changer la photo de profil</h3>
+                <p class="text-gray-600 mb-6">Choisissez une nouvelle photo pour votre profil</p>
+                
+                <div class="mb-6">
+                    <input type="file" id="avatarInput" accept="image/*" class="hidden">
+                    <button onclick="document.getElementById('avatarInput').click()" 
+                            class="btn-gradient px-6 py-3 text-white rounded-lg w-full mb-3">
+                        <i class="fas fa-upload mr-2"></i>
+                        Choisir une photo
+                    </button>
+                    <p class="text-sm text-gray-500">Formats acceptés: JPG, PNG (max 5MB)</p>
+                </div>
+                
+                <div class="flex justify-center space-x-4">
+                    <button onclick="hideAvatarModal()" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                        Annuler
+                    </button>
+                    <button onclick="saveAvatar()" class="btn-gradient px-6 py-2 text-white rounded-lg">
+                        Sauvegarder
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Admin profile data
+        let adminProfile = {
+            firstName: 'Admin',
+            lastName: 'MEFEM',
+            email: 'admin@mefem.com',
+            phone: '+225 01 23 45 67 89',
+            currentPassword: '',
+            newPassword: ''
+        };
+        
+        let isEditing = false;
+        let originalValues = {};
+        
+        // Toggle sidebar pour mobile
+        const toggleSidebar = document.getElementById('toggle-sidebar');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        
+        toggleSidebar.addEventListener('click', function() {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        });
+        
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('open');
+            overlay.classList.add('hidden');
+        });
+        
+        // Edit profile functionality
+        document.getElementById('editBtn').addEventListener('click', function() {
+            if (!isEditing) {
+                startEditing();
+            }
+        });
+        
+        document.getElementById('cancelBtn').addEventListener('click', function() {
+            cancelEditing();
+        });
+        
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveProfile();
+        });
+        
+        function startEditing() {
+            isEditing = true;
+            
+            // Store original values
+            originalValues = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value
+            };
+            
+            // Enable form inputs
+            document.getElementById('firstName').disabled = false;
+            document.getElementById('lastName').disabled = false;
+            document.getElementById('email').disabled = false;
+            document.getElementById('phone').disabled = false;
+            document.getElementById('currentPassword').disabled = false;
+            document.getElementById('newPassword').disabled = false;
+            
+            // Show form actions
+            document.getElementById('formActions').style.display = 'flex';
+            
+            // Update edit button
+            const editBtn = document.getElementById('editBtn');
+            editBtn.innerHTML = '<i class="fas fa-times"></i><span>Annuler</span>';
+            editBtn.onclick = cancelEditing;
+            
+            // Focus on first input
+            document.getElementById('firstName').focus();
+        }
+        
+        function cancelEditing() {
+            isEditing = false;
+            
+            // Restore original values
+            document.getElementById('firstName').value = originalValues.firstName;
+            document.getElementById('lastName').value = originalValues.lastName;
+            document.getElementById('email').value = originalValues.email;
+            document.getElementById('phone').value = originalValues.phone;
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            
+            // Disable form inputs
+            document.getElementById('firstName').disabled = true;
+            document.getElementById('lastName').disabled = true;
+            document.getElementById('email').disabled = true;
+            document.getElementById('phone').disabled = true;
+            document.getElementById('currentPassword').disabled = true;
+            document.getElementById('newPassword').disabled = true;
+            
+            // Hide form actions
+            document.getElementById('formActions').style.display = 'none';
+            
+            // Reset edit button
+            const editBtn = document.getElementById('editBtn');
+            editBtn.innerHTML = '<i class="fas fa-edit"></i><span>Modifier</span>';
+            editBtn.onclick = startEditing;
+        }
+        
+        function saveProfile() {
+            // Get form values
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            
+            // Validate required fields
+            if (!firstName || !lastName || !email || !phone) {
+                showNotification('Veuillez remplir tous les champs obligatoires', 'error');
+                return;
+            }
+            
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showNotification('Format d\'email invalide', 'error');
+                return;
+            }
+            
+            // Validate phone format
+            const phoneRegex = /^\+225\s\d{2}\s\d{2}\s\d{2}\s\d{2}\s\d{2}$/;
+            if (!phoneRegex.test(phone)) {
+                showNotification('Format de téléphone invalide (+225 XX XX XX XX XX)', 'error');
+                return;
+            }
+            
+            // Validate password change
+            if (newPassword && !currentPassword) {
+                showNotification('Veuillez saisir votre mot de passe actuel', 'error');
+                return;
+            }
+            
+            if (newPassword && newPassword.length < 8) {
+                showNotification('Le nouveau mot de passe doit contenir au moins 8 caractères', 'error');
+                return;
+            }
+            
+            // Update profile data
+            adminProfile.firstName = firstName;
+            adminProfile.lastName = lastName;
+            adminProfile.email = email;
+            adminProfile.phone = phone;
+            
+            // Update display
+            document.getElementById('displayName').textContent = `${firstName} ${lastName}`;
+            document.getElementById('displayEmail').textContent = email;
+            document.getElementById('displayPhone').textContent = phone;
+            
+            // Update avatar initials
+            const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`;
+            document.getElementById('userAvatar').textContent = initials;
+            
+            // Simulate API call
+            setTimeout(() => {
+                showNotification('Profil mis à jour avec succès', 'success');
+                cancelEditing();
+            }, 1000);
+        }
+        
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const toggle = input.nextElementSibling;
+            const icon = toggle.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+        
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        function showAvatarModal() {
+            document.getElementById('avatarModal').classList.remove('hidden');
+        }
+        
+        function hideAvatarModal() {
+            document.getElementById('avatarModal').classList.add('hidden');
+        }
+        
+        function saveAvatar() {
+            const fileInput = document.getElementById('avatarInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showNotification('Veuillez sélectionner une image', 'error');
+                return;
+            }
+            
+            // Validate file size (5MB max)
+            if (file.size > 5 * 1024 * 1024) {
+                showNotification('L\'image doit faire moins de 5MB', 'error');
+                return;
+            }
+            
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            if (!allowedTypes.includes(file.type)) {
+                showNotification('Format d\'image non supporté. Utilisez JPG ou PNG', 'error');
+                return;
+            }
+            
+            // Create preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const avatar = document.getElementById('userAvatar');
+                avatar.style.backgroundImage = `url(${e.target.result})`;
+                avatar.style.backgroundSize = 'cover';
+                avatar.style.backgroundPosition = 'center';
+                avatar.textContent = '';
+                
+                showNotification('Photo de profil mise à jour', 'success');
+                hideAvatarModal();
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Handle file input change
+        document.getElementById('avatarInput').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                // File selected, ready to save
+            }
+        });
+        
+        // Initialize profile display
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial values
+            document.getElementById('displayName').textContent = `${adminProfile.firstName} ${adminProfile.lastName}`;
+            document.getElementById('displayEmail').textContent = adminProfile.email;
+            document.getElementById('displayPhone').textContent = adminProfile.phone;
+            
+            const initials = `${adminProfile.firstName.charAt(0)}${adminProfile.lastName.charAt(0)}`;
+            document.getElementById('userAvatar').textContent = initials;
+        });
+    </script>
+</body>
+</html>

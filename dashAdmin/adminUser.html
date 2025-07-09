@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utilisateurs - MEFEM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .sidebar {
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+        }
+        
+        .sidebar-item {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sidebar-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .sidebar-item:hover::before {
+            left: 100%;
+        }
+        
+        .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .sidebar-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid white;
+        }
+        
+        .main-content {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        
+        .stats-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+        
+        .user-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .user-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        .btn-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-gradient:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-danger:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-success:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+        
+        .modal {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+        
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        
+        .status-inactive {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+        
+        .plan-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .plan-hebdo {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+        
+        .plan-mensuel {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .plan-annuel {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        
+        .last-login {
+            font-size: 0.75rem;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .last-login.recent {
+            color: #10b981;
+        }
+        
+        .last-login.old {
+            color: #ef4444;
+        }
+        
+        .article-count {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+        
+        .article-count .number {
+            font-size: 1.25rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .table-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: white;
+            position: relative;
+        }
+        
+        .online-indicator {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            background: #10b981;
+            border: 2px solid white;
+            border-radius: 50%;
+        }
+        
+        .offline-indicator {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            background: #ef4444;
+            border: 2px solid white;
+            border-radius: 50%;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 50;
+                height: 100vh;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+            }
+            
+            .stats-card {
+                padding: 1rem;
+            }
+            
+            .table-responsive {
+                overflow-x: auto;
+            }
+        }
+        
+        .bulk-actions {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .bulk-actions.show {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Overlay pour mobile -->
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden"></div>
+    
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar fixed left-0 top-0 w-64 h-full shadow-2xl z-50">
+        <div class="p-6 border-b border-white/20">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                    <i class="fas fa-gem text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-white text-2xl font-bold">MEFEM</h1>
+                    <p class="text-white/80 text-sm">Super Admin</p>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="mt-6">
+            <ul class="space-y-2 px-4">
+                <li>
+                    <a href="dashAdmin.html" class="sidebar-item flex items-center px-4 py-3 text-white rounded-lg block">
+                        <i class="fas fa-tachometer-alt w-6 text-center mr-3"></i>
+                        <span>Tableau de Bord</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="adminUser.html" class="sidebar-item active flex items-center px-4 py-3 text-white rounded-lg block">
+                        <i class="fas fa-users w-6 text-center mr-3"></i>
+                        <span>Utilisateurs</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="adminHistorique.html" class="sidebar-item flex items-center px-4 py-3 text-white rounded-lg block">
+                        <i class="fas fa-history w-6 text-center mr-3"></i>
+                        <span>Historique</span>
+                    </a>
+                </li>
+                <li class="pt-4 border-t border-white/20">
+                    <a href="adminProfile.html" class="sidebar-item flex items-center px-4 py-3 text-white rounded-lg block hover:bg-blue-500/20">
+                        <i class="fas fa-user-cog w-6 text-center mr-3"></i>
+                        <span>Profil Admin</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../auth/login.html" onclick="logout()" class="sidebar-item flex items-center px-4 py-3 text-white rounded-lg block hover:bg-red-500/20">
+                        <i class="fas fa-sign-out-alt w-6 text-center mr-3"></i>
+                        <span>Déconnexion</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content ml-64 transition-all duration-300">
+        <!-- Header -->
+        <header class="bg-white/90 backdrop-blur-xl shadow-lg sticky top-0 z-30">
+            <div class="flex items-center justify-between px-6 py-4">
+                <div class="flex items-center space-x-4">
+                    <button id="toggle-sidebar" class="md:hidden text-gray-600 hover:text-gray-800">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <div>
+                        <h1 class="text-2xl font-bold gradient-text">Gestion des Utilisateurs</h1>
+                        <p class="text-gray-600 text-sm">Gérer tous les utilisateurs de la plateforme MEFEM</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <button class="p-2 text-gray-600 hover:text-gray-800 relative">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span class="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"></span>
+                        </button>
+                    </div>
+                    <div class="w-10 h-10 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user-shield text-white"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Stats Cards -->
+        <section class="py-6 px-6">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- Total Users -->
+                    <div class="stats-card p-6 fade-in">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Total Utilisateurs</p>
+                                <p class="text-3xl font-bold gradient-text" id="totalUsers">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-users text-white"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Active Users -->
+                    <div class="stats-card p-6 fade-in">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Utilisateurs Actifs</p>
+                                <p class="text-3xl font-bold gradient-text" id="activeUsers">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user-check text-white"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Online Users -->
+                    <div class="stats-card p-6 fade-in">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">En Ligne</p>
+                                <p class="text-3xl font-bold gradient-text" id="onlineUsers">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-circle text-white"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Total Articles -->
+                    <div class="stats-card p-6 fade-in">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Total Articles</p>
+                                <p class="text-3xl font-bold gradient-text" id="totalArticles">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-newspaper text-white"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Filters and Search -->
+                <div class="stats-card p-6 mb-6 fade-in">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <div class="relative">
+                                <input type="text" 
+                                       id="searchUsers" 
+                                       placeholder="Rechercher un utilisateur..."
+                                       class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-80">
+                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            </div>
+                            <select id="filterPlan" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Tous les plans</option>
+                                <option value="hebdo">Hebdomadaire</option>
+                                <option value="mensuel">Mensuel</option>
+                                <option value="annuel">Annuel</option>
+                            </select>
+                            <select id="filterStatus" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Tous les statuts</option>
+                                <option value="active">Actif</option>
+                                <option value="inactive">Inactif</option>
+                            </select>
+                        </div>
+                        <div class="flex gap-2">
+                            <button id="refreshBtn" class="btn-gradient px-4 py-2 text-white rounded-lg text-sm">
+                                <i class="fas fa-sync-alt mr-2"></i>Actualiser
+                            </button>
+                            <button id="exportBtn" class="btn-success px-4 py-2 text-white rounded-lg text-sm">
+                                <i class="fas fa-download mr-2"></i>Exporter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bulk Actions -->
+                <div id="bulkActions" class="bulk-actions fade-in">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <span id="selectedCount" class="text-sm font-medium text-gray-600">0 utilisateur(s) sélectionné(s)</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button id="bulkDeleteBtn" class="btn-danger px-4 py-2 text-white rounded-lg text-sm">
+                                <i class="fas fa-trash mr-2"></i>Supprimer la sélection
+                            </button>
+                            <button id="bulkActivateBtn" class="btn-success px-4 py-2 text-white rounded-lg text-sm">
+                                <i class="fas fa-check mr-2"></i>Activer
+                            </button>
+                            <button id="bulkDeactivateBtn" class="btn-danger px-4 py-2 text-white rounded-lg text-sm">
+                                <i class="fas fa-ban mr-2"></i>Désactiver
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Users Table -->
+                <div class="stats-card p-6 fade-in">
+                    <div class="table-responsive">
+                        <table class="w-full table-auto">
+                            <thead class="table-header">
+                                <tr class="border-b border-gray-200">
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">
+                                        <input type="checkbox" id="selectAll" class="rounded border-gray-300">
+                                    </th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Utilisateur</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Contact</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Plan</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Articles</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Dernière Connexion</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- Users will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-6 gap-4">
+                        <div class="text-sm text-gray-600">
+                            Affichage de <span id="showingStart">1</span> à <span id="showingEnd">10</span> sur <span id="totalShowing">0</span> utilisateurs
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button id="prevPage" class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 disabled:opacity-50">Précédent</button>
+                            <span id="currentPage" class="px-3 py-1 bg-blue-500 text-white rounded text-sm">1</span>
+                            <button id="nextPage" class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 disabled:opacity-50">Suivant</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal fixed inset-0 flex items-center justify-center z-50 hidden">
+        <div class="modal-content max-w-md mx-4 p-6">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-exclamation-triangle text-red-500 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Confirmer la suppression</h3>
+                <p class="text-gray-600 mb-6" id="deleteMessage">Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.</p>
+                <div class="flex justify-center space-x-4">
+                    <button id="cancelDelete" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                        Annuler
+                    </button>
+                    <button id="confirmDelete" class="btn-danger px-6 py-2 text-white rounded-lg">
+                        Supprimer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- User Details Modal -->
+    <div id="userDetailsModal" class="modal fixed inset-0 flex items-center justify-center z-50 hidden">
+        <div class="modal-content max-w-2xl mx-4 p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold gradient-text">Détails de l'utilisateur</h3>
+                <button id="closeUserDetails" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="userDetailsContent">
+                <!-- User details will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Sample data for users with more comprehensive information
+        const usersData = [
+            {
+                id: 1,
+                firstName: "Marie",
+                lastName: "Koné",
+                email: "marie.kone@email.com",
+                phone: "+225 01 23 45 67 89",
+                specialty: "Commerçante",
+                plan: "mensuel",
+                articles: 23,
+                status: "active",
+                joinDate: "2024-01-15",
+                lastLogin: "2024-07-08 10:30:00",
+                isOnline: true,
+                totalRevenue: 45000,
+                location: "Abidjan, Cocody"
+            },
+            {
+                id: 2,
+                firstName: "Fatou",
+                lastName: "Traoré",
+                email: "fatou.traore@email.com",
+                phone: "+225 07 89 12 34 56",
+                specialty: "Coiffeuse",
+                plan: "hebdo",
+                articles: 12,
+                status: "active",
+                joinDate: "2024-02-20",
+                lastLogin: "2024-07-07 15:45:00",
+                isOnline: false,
+                totalRevenue: 20000,
+                location: "Abidjan, Yopougon"
+            },
+            {
+                id: 3,
+                firstName: "Aminata",
+                lastName: "Diallo",
+                email: "aminata.diallo@email.com",
+                phone: "+225 05 67 89 01 23",
+                specialty: "Couturière",
+                plan: "annuel",
+                articles: 45,
+                status: "inactive",
+                joinDate: "2023-11-10",
+                lastLogin: "2024-06-20 09:15:00",
+                isOnline: false,
+                totalRevenue: 150000,
+                location: "Abidjan, Adjamé"
+            },
+            {
+                id: 4,
+                firstName: "Aissatou",
+                lastName: "Coulibaly",
+                email: "aissatou.coulibaly@email.com",
+                phone: "+225 02 34 56 78 90",
+                specialty: "Restauratrice",
+                plan: "mensuel",
+                articles: 31,
+                status: "active",
+                joinDate: "2024-01-08",
+                lastLogin: "2024-07-08 14:22:00",
+                isOnline: true,
+                totalRevenue: 75000,
+                location: "Abidjan, Plateau"
+            },
+            {
+                id: 5,
+                firstName: "Mariam",
+                lastName: "Ouattara",
+                email: "mariam.ouattara@email.com",
+                phone: "+225 09 87 65 43 21",
+                specialty: "Esthéticienne",
+                plan: "mensuel",
+                articles: 18,
+                status: "active",
+                joinDate: "2024-03-05",
+                lastLogin: "2024-07-06 11:30:00",
+                isOnline: false,
+                totalRevenue: 30000,
+                location: "Abidjan, Treichville"
+            },
+            {
+                id: 6,
+                firstName: "Fatoumata",
+                lastName: "Bamba",
+                email: "fatoumata.bamba@email.com",
+                phone: "+225 03 45 67 89 01",
+                specialty: "Bijoutière",
+                plan: "hebdo",
+                articles: 8,
+                status: "active",
+                joinDate: "2024-04-12",
+                lastLogin: "2024-07-08 09:45:00",
+                isOnline: true,
+                totalRevenue: 15000,
+                location: "Abidjan, Marcory"
+            },
+            {
+                id: 7,
+                firstName: "Kadiatou",
+                lastName: "Sidibé",
+                email: "kadiatou.sidibe@email.com",
+                phone: "+225 08 76 54 32 10",
+                specialty: "Boulangère",
+                plan: "annuel",
+                articles: 67,
+                status: "active",
+                joinDate: "2023-09-15",
+                lastLogin: "2024-07-08 16:20:00",
+                isOnline: true,
+                totalRevenue: 200000,
+                location: "Abidjan, Koumassi"
+            },
+            {
+                id: 8,
+                firstName: "Awa",
+                lastName: "Konaté",
+                email: "awa.konate@email.com",
+                phone: "+225 06 54 32 10 98",
+                specialty: "Vendeuse",
+                plan: "mensuel",
+                articles: 15,
+                status: "inactive",
+                joinDate: "2024-02-28",
+                lastLogin: "2024-06-15 13:10:00",
+                isOnline: false,
+                totalRevenue: 25000,
+                location: "Abidjan, Abobo"
+            }
+        ];
+
+        // Global variables
+        let currentUsers = [...usersData];
+        let filteredUsers = [...usersData];
+        let selectedUsers = new Set();
+        let currentPage = 1;
+        const usersPerPage = 10;
+
+        // DOM elements
+        const usersTableBody = document.getElementById('usersTableBody');
+        const searchInput = document.getElementById('searchUsers');
+        const filterPlan = document.getElementById('filterPlan');
+        const filterStatus = document.getElementById('filterStatus');
+        const selectAllCheckbox = document.getElementById('selectAll');
+        const bulkActions = document.getElementById('bulkActions');
+        const selectedCount = document.getElementById('selectedCount');
+        const totalUsersElement = document.getElementById('totalUsers');
+        const activeUsersElement = document.getElementById('activeUsers');
+        const onlineUsersElement = document.getElementById('onlineUsers');
+        const totalArticlesElement = document.getElementById('totalArticles');
+
+        // Initialize the application
+        function init() {
+            updateStats();
+            renderUsers();
+            setupEventListeners();
+        }
+
+        // Update statistics
+        function updateStats() {
+            const totalUsers = currentUsers.length;
+            const activeUsers = currentUsers.filter(user => user.status === 'active').length;
+            const onlineUsers = currentUsers.filter(user => user.isOnline).length;
+            const totalArticles = currentUsers.reduce((sum, user) => sum + user.articles, 0);
+
+            totalUsersElement.textContent = totalUsers;
+            activeUsersElement.textContent = activeUsers;
+            onlineUsersElement.textContent = onlineUsers;
+            totalArticlesElement.textContent = totalArticles;
+        }
+
+        // Render users table
+        function renderUsers() {
+            const startIndex = (currentPage - 1) * usersPerPage;
+            const endIndex = startIndex + usersPerPage;
+            const usersToShow = filteredUsers.slice(startIndex, endIndex);
+
+            usersTableBody.innerHTML = '';
+
+            usersToShow.forEach(user => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-100 hover:bg-gray-50 transition-colors';
+                
+                const lastLoginDate = new Date(user.lastLogin);
+                const now = new Date();
+                const timeDiff = now - lastLoginDate;
+                const hoursDiff = timeDiff / (1000 * 60 * 60);
+                
+                let lastLoginClass = 'last-login';
+                if (hoursDiff < 1) {
+                    lastLoginClass += ' recent';
+                } else if (hoursDiff > 24) {
+                    lastLoginClass += ' old';
+                }
+
+                row.innerHTML = `
+                    <td class="py-3 px-4">
+                        <input type="checkbox" class="user-checkbox rounded border-gray-300" data-user-id="${user.id}">
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="user-avatar bg-gradient-to-r from-${getAvatarColor(user.id)}-500 to-${getAvatarColor(user.id)}-600">
+                                ${user.firstName.charAt(0)}${user.lastName.charAt(0)}
+                                <div class="${user.isOnline ? 'online-indicator' : 'offline-indicator'}"></div>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-gray-900">${user.firstName} ${user.lastName}</div>
+                                <div class="text-sm text-gray-500">${user.specialty}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="text-sm">
+                            <div class="font-medium text-gray-900">${user.email}</div>
+                            <div class="text-gray-500">${user.phone}</div>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="plan-badge plan-${user.plan}">${getPlanName(user.plan)}</span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="article-count">
+                            <i class="fas fa-newspaper text-gray-400"></i>
+                            <span class="number">${user.articles}</span>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="status-badge ${user.status === 'active' ? 'status-active' : 'status-inactive'}">
+                            ${user.status === 'active' ? 'Actif' : 'Inactif'}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="${lastLoginClass}">
+                            <i class="fas fa-clock"></i>
+                            ${formatLastLogin(user.lastLogin)}
+                        </div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="flex items-center space-x-2">
+                            <button onclick="viewUserDetails(${user.id})" class="text-blue-600 hover:text-blue-800 p-1">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button onclick="deleteUser(${user.id})" class="text-red-600 hover:text-red-800 p-1">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                
+                usersTableBody.appendChild(row);
+            });
+
+            updatePagination();
+            updateBulkActions();
+        }
+
+        // Helper functions
+        function getAvatarColor(id) {
+            const colors = ['blue', 'green', 'purple', 'red', 'yellow', 'indigo', 'pink', 'teal'];
+            return colors[id % colors.length];
+        }
+
+        function getPlanName(plan) {
+            const planNames = {
+                'hebdo': 'Hebdo',
+                'mensuel': 'Mensuel',
+                'annuel': 'Annuel'
+            };
+            return planNames[plan] || plan;
+        }
+
+        function formatLastLogin(lastLogin) {
+            const date = new Date(lastLogin);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'À l\'instant';
+            if (diffMins < 60) return `Il y a ${diffMins} min`;
+            if (diffHours < 24) return `Il y a ${diffHours}h`;
+            if (diffDays < 7) return `Il y a ${diffDays}j`;
+            return date.toLocaleDateString('fr-FR');
+        }
+
+        // Filter and search functionality
+        function filterUsers() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const planFilter = filterPlan.value;
+            const statusFilter = filterStatus.value;
+
+            filteredUsers = currentUsers.filter(user => {
+                const matchesSearch = !searchTerm || 
+                    user.firstName.toLowerCase().includes(searchTerm) ||
+                    user.lastName.toLowerCase().includes(searchTerm) ||
+                    user.email.toLowerCase().includes(searchTerm) ||
+                    user.specialty.toLowerCase().includes(searchTerm);
+                
+                const matchesPlan = !planFilter || user.plan === planFilter;
+                const matchesStatus = !statusFilter || user.status === statusFilter;
+
+                return matchesSearch && matchesPlan && matchesStatus;
+            });
+
+            currentPage = 1;
+            renderUsers();
+        }
+
+        // Pagination
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+            const start = (currentPage - 1) * usersPerPage + 1;
+            const end = Math.min(currentPage * usersPerPage, filteredUsers.length);
+
+            document.getElementById('showingStart').textContent = start;
+            document.getElementById('showingEnd').textContent = end;
+            document.getElementById('totalShowing').textContent = filteredUsers.length;
+            document.getElementById('currentPage').textContent = currentPage;
+
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages;
+        }
+
+        // Bulk actions
+        function updateBulkActions() {
+            if (selectedUsers.size > 0) {
+                bulkActions.classList.add('show');
+                selectedCount.textContent = `${selectedUsers.size} utilisateur(s) sélectionné(s)`;
+            } else {
+                bulkActions.classList.remove('show');
+            }
+        }
+
+        // User actions
+        function viewUserDetails(userId) {
+            const user = currentUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            const modal = document.getElementById('userDetailsModal');
+            const content = document.getElementById('userDetailsContent');
+
+            content.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="user-avatar bg-gradient-to-r from-${getAvatarColor(user.id)}-500 to-${getAvatarColor(user.id)}-600 w-16 h-16 text-lg">
+                                ${user.firstName.charAt(0)}${user.lastName.charAt(0)}
+                                <div class="${user.isOnline ? 'online-indicator' : 'offline-indicator'}"></div>
+                            </div>
+                            <div>
+                                <h4 class="text-xl font-bold text-gray-900">${user.firstName} ${user.lastName}</h4>
+                                <p class="text-gray-600">${user.specialty}</p>
+                                <span class="status-badge ${user.status === 'active' ? 'status-active' : 'status-inactive'}">
+                                    ${user.status === 'active' ? 'Actif' : 'Inactif'}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-sm font-medium text-gray-700">Email</label>
+                                <p class="text-gray-900">${user.email}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-700">Téléphone</label>
+                                <p class="text-gray-900">${user.phone}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-700">Localisation</label>
+                                <p class="text-gray-900">${user.location}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="stats-card p-4">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold gradient-text">${user.articles}</div>
+                                    <div class="text-sm text-gray-600">Articles publiés</div>
+                                </div>
+                            </div>
+                            <div class="stats-card p-4">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold gradient-text">${user.totalRevenue.toLocaleString()} FCFA</div>
+                                    <div class="text-sm text-gray-600">Revenus totaux</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-sm font-medium text-gray-700">Plan d'abonnement</label>
+                                <p><span class="plan-badge plan-${user.plan}">${getPlanName(user.plan)}</span></p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-700">Date d'inscription</label>
+                                <p class="text-gray-900">${new Date(user.joinDate).toLocaleDateString('fr-FR')}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-700">Dernière connexion</label>
+                                <p class="text-gray-900">${formatLastLogin(user.lastLogin)}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+        }
+
+        function deleteUser(userId) {
+            const user = currentUsers.find(u => u.id === userId);
+            const modal = document.getElementById('deleteModal');
+            const message = document.getElementById('deleteMessage');
+            
+            message.textContent = `Êtes-vous sûr de vouloir supprimer ${user.firstName} ${user.lastName} ? Cette action est irréversible.`;
+            
+            modal.classList.remove('hidden');
+            
+            document.getElementById('confirmDelete').onclick = () => {
+                currentUsers = currentUsers.filter(u => u.id !== userId);
+                filteredUsers = filteredUsers.filter(u => u.id !== userId);
+                selectedUsers.delete(userId);
+                updateStats();
+                renderUsers();
+                modal.classList.add('hidden');
+            };
+        }
+
+        // Event listeners
+        function setupEventListeners() {
+            // Search and filters
+            searchInput.addEventListener('input', filterUsers);
+            filterPlan.addEventListener('change', filterUsers);
+            filterStatus.addEventListener('change', filterUsers);
+
+            // Pagination
+            document.getElementById('prevPage').addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderUsers();
+                }
+            });
+
+            document.getElementById('nextPage').addEventListener('click', () => {
+                const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderUsers();
+                }
+            });
+
+            // Select all checkbox
+            selectAllCheckbox.addEventListener('change', (e) => {
+                const checkboxes = document.querySelectorAll('.user-checkbox');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = e.target.checked;
+                    const userId = parseInt(checkbox.dataset.userId);
+                    if (e.target.checked) {
+                        selectedUsers.add(userId);
+                    } else {
+                        selectedUsers.delete(userId);
+                    }
+                });
+                updateBulkActions();
+            });
+
+            // Individual checkboxes
+            usersTableBody.addEventListener('change', (e) => {
+                if (e.target.classList.contains('user-checkbox')) {
+                    const userId = parseInt(e.target.dataset.userId);
+                    if (e.target.checked) {
+                        selectedUsers.add(userId);
+                    } else {
+                        selectedUsers.delete(userId);
+                        selectAllCheckbox.checked = false;
+                    }
+                    updateBulkActions();
+                }
+            });
+
+            // Bulk actions
+            document.getElementById('bulkDeleteBtn').addEventListener('click', () => {
+                if (selectedUsers.size > 0) {
+                    if (confirm(`Êtes-vous sûr de vouloir supprimer ${selectedUsers.size} utilisateur(s) ?`)) {
+                        currentUsers = currentUsers.filter(u => !selectedUsers.has(u.id));
+                        filteredUsers = filteredUsers.filter(u => !selectedUsers.has(u.id));
+                        selectedUsers.clear();
+                        updateStats();
+                        renderUsers();
+                    }
+                }
+            });
+
+            document.getElementById('bulkActivateBtn').addEventListener('click', () => {
+                if (selectedUsers.size > 0) {
+                    currentUsers.forEach(user => {
+                        if (selectedUsers.has(user.id)) {
+                            user.status = 'active';
+                        }
+                    });
+                    selectedUsers.clear();
+                    updateStats();
+                    renderUsers();
+                }
+            });
+
+            document.getElementById('bulkDeactivateBtn').addEventListener('click', () => {
+                if (selectedUsers.size > 0) {
+                    currentUsers.forEach(user => {
+                        if (selectedUsers.has(user.id)) {
+                            user.status = 'inactive';
+                        }
+                    });
+                    selectedUsers.clear();
+                    updateStats();
+                    renderUsers();
+                }
+            });
+
+            // Refresh button
+            document.getElementById('refreshBtn').addEventListener('click', () => {
+                // Simulate refresh by shuffling the data
+                currentUsers = [...usersData].sort(() => Math.random() - 0.5);
+                filteredUsers = [...currentUsers];
+                selectedUsers.clear();
+                currentPage = 1;
+                updateStats();
+                renderUsers();
+            });
+
+            // Export button
+            document.getElementById('exportBtn').addEventListener('click', () => {
+                const csvContent = generateCSV();
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'utilisateurs_mefem.csv';
+                link.click();
+            });
+
+            // Modal close buttons
+            document.getElementById('cancelDelete').addEventListener('click', () => {
+                document.getElementById('deleteModal').classList.add('hidden');
+            });
+
+            document.getElementById('closeUserDetails').addEventListener('click', () => {
+                document.getElementById('userDetailsModal').classList.add('hidden');
+            });
+
+            // Mobile sidebar toggle
+            document.getElementById('toggle-sidebar').addEventListener('click', () => {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('overlay');
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('hidden');
+            });
+
+            document.getElementById('overlay').addEventListener('click', () => {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('overlay');
+                sidebar.classList.remove('open');
+                overlay.classList.add('hidden');
+            });
+        }
+
+        // Generate CSV for export
+        function generateCSV() {
+            const headers = ['ID', 'Prénom', 'Nom', 'Email', 'Téléphone', 'Spécialité', 'Plan', 'Articles', 'Statut', 'Date d\'inscription', 'Dernière connexion', 'Revenus totaux', 'Localisation'];
+            const csvRows = [headers.join(',')];
+
+            filteredUsers.forEach(user => {
+                const row = [
+                    user.id,
+                    user.firstName,
+                    user.lastName,
+                    user.email,
+                    user.phone,
+                    user.specialty,
+                    getPlanName(user.plan),
+                    user.articles,
+                    user.status === 'active' ? 'Actif' : 'Inactif',
+                    user.joinDate,
+                    user.lastLogin,
+                    user.totalRevenue,
+                    user.location
+                ];
+                csvRows.push(row.join(','));
+            });
+
+            return csvRows.join('\n');
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
